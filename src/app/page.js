@@ -1,113 +1,165 @@
-import Image from 'next/image'
+'use client';
+import {Button, List, ListItem, ListItemText, TextField} from '@mui/material';
+import {useRef, useState} from "react";
+
+class CIDR {
+    /**
+     * Construct from string
+     *
+     * @param {string} s - CIDR in format of `1.1.1.1/24` */
+    static from_str(s) {
+        let arr = s.split('/');
+        let addr = arr.at(0);
+        let ip_seg = addr.split('.');
+
+        let prefix_len = parseInt(arr.at(1));
+
+        let addr_pfx = 0;
+        for (let i = 0; i < 4; i++) {
+            addr_pfx <<= 8;
+            addr_pfx += parseInt(ip_seg[i]);
+        }
+        addr_pfx >>= 32 - prefix_len;
+        addr_pfx <<= 32 - prefix_len;
+        return new CIDR(prefix_len, addr_pfx);
+    }
+
+    /**
+     * Construct
+     *
+     * @param {number} pl - prefix length
+     * @param {number} pf - address prefix*/
+    constructor(pl, pf) {
+
+        this.prefix_len = pl;
+
+        this.addr_num = pf;
+
+        this.mask_num = 0;
+        for (let i = 0; i < this.prefix_len; i++) {
+            this.mask_num |= 1 << i;
+        }
+        this.mask_num <<= 32 - this.prefix_len;
+    }
+
+    info() {
+        let seg = [];
+        let bin_repr = this.addr_num;
+        for (let i = 0; i < 4; i++) {
+            seg.push(bin_repr % (1 << 8));
+            bin_repr >>= 8;
+        }
+        seg.reverse();
+        let addr = '';
+        for (let i = 0; i < seg.length - 1; i++) {
+            addr = addr.concat(seg[i].toString(), '.');
+        }
+        addr = addr.concat(seg[seg.length - 1].toString(), '/', this.prefix_len.toString());
+        return addr;
+    }
+
+    /**
+     * Subtract
+     *
+     * @param {CIDR} b - the other operand
+     * @return {CIDR[]} */
+    subtract(b) {
+        if (!this.common(b)) return Array.of(this);
+        if (!this.greater(b)) {
+            return Array.of();
+        }
+        let sub = this.bisect();
+        let ans = [];
+        for (let i = 0; i < sub.length; i++) {
+            ans = ans.concat(sub[i].subtract(b));
+        }
+        return ans;
+    }
+
+    /**
+     * Split into two
+     * @return {CIDR[]} */
+    bisect() {
+        if (this.prefix_len === 32) {
+            return Array.of(this)
+        } else {
+            return Array.of(new CIDR(this.prefix_len + 1, this.addr_num), new CIDR(this.prefix_len + 1, this.addr_num | (1 << (32 - (this.prefix_len + 1)))));
+        }
+    }
+
+    /**
+     * Greater
+     *
+     * @param {CIDR} b - the other operand
+     * @return {boolean} */
+    greater(b) {
+        if (this.prefix_len >= b.prefix_len) return false;
+        if ((this.mask_num & b.addr_num) === this.addr_num) return true; else return false;
+    }
+
+    /**
+     * Equal
+     *
+     * @param {CIDR} b - the other operand
+     * @return {boolean} */
+    equals(b) {
+        return this.addr_num === b.addr_num && this.prefix_len === b.prefix_len;
+    }
+
+    /**
+     * Has common
+     *
+     * @param {CIDR} b - the other operand
+     * @return {boolean} */
+    common(b) {
+        return this.equals(b) || this.greater(b) || b.greater(this);
+    }
+}
+
+
+/**
+ * Render
+ *
+ * @param {CIDR} c - the CIDR
+ * @param {number} idx - list index
+ * */
+function RenderCIDR(c,idx) {
+    return (<ListItem key={idx}>
+        <ListItemText primary={c.info()} />
+    </ListItem>);
+}
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    const [state, setState] = useState({
+        answer: []
+    });
+    const r = useRef({
+        input: ''
+    })
+    return (<div>
+        <TextField onChange={(e) => {
+            r.current.input = e.target.value;
+        }}/>
+        <Button onClick={() => {
+            let OP = r.current.input.split('-');
+            if (OP.length <= 1) {
+                let new_state = {...state, answer: OP.map((f) => CIDR.from_str(f))};
+                setState(new_state);
+                return;
+            }
+            let ans = [CIDR.from_str(OP.at(0))];
+            for (let i = 1; i < OP.length; i++) {
+                let b = CIDR.from_str(OP[i]);
+                let next = [];
+                for (let j = 0; j < ans.length; j++) {
+                    next = next.concat(ans[j].subtract(b));
+                }
+                ans = next;
+            }
+            setState({...state, answer: ans});
+        }}>Calculate</Button>
+        <List>
+            {state.answer.map((e,idx) => RenderCIDR(e,idx))}
+        </List>
+    </div>);
 }
