@@ -3,16 +3,16 @@ import {Button, List, ListItem, ListItemText, TextField} from '@mui/material';
 import {useRef, useState} from "react";
 
 class CIDR {
-    /**
-     * Construct from string
-     *
-     * @param {string} s - CIDR in format of `1.1.1.1/24` */
-    static from_str(s) {
+    private prefix_len: number;
+    private addr_num: number;
+    private mask_num: number;
+
+    static from_str(s: string) {
         let arr = s.split('/');
-        let addr = arr.at(0);
+        let addr = arr[0];
         let ip_seg = addr.split('.');
 
-        let prefix_len = parseInt(arr.at(1));
+        let prefix_len = parseInt(arr[1]);
 
         let addr_pfx = 0;
         for (let i = 0; i < 4; i++) {
@@ -29,7 +29,7 @@ class CIDR {
      *
      * @param {number} pl - prefix length
      * @param {number} pf - address prefix*/
-    constructor(pl, pf) {
+    constructor(pl: number, pf: number) {
 
         this.prefix_len = pl;
 
@@ -58,28 +58,20 @@ class CIDR {
         return addr;
     }
 
-    /**
-     * Subtract
-     *
-     * @param {CIDR} b - the other operand
-     * @return {CIDR[]} */
-    subtract(b) {
+    subtract(b: CIDR): CIDR[] {
         if (!this.common(b)) return Array.of(this);
         if (!this.greater(b)) {
             return Array.of();
         }
         let sub = this.bisect();
-        let ans = [];
+        let ans: CIDR[] = [];
         for (let i = 0; i < sub.length; i++) {
             ans = ans.concat(sub[i].subtract(b));
         }
         return ans;
     }
 
-    /**
-     * Split into two
-     * @return {CIDR[]} */
-    bisect() {
+    bisect(): CIDR[] {
         if (this.prefix_len === 32) {
             return Array.of(this)
         } else {
@@ -87,51 +79,32 @@ class CIDR {
         }
     }
 
-    /**
-     * Greater
-     *
-     * @param {CIDR} b - the other operand
-     * @return {boolean} */
-    greater(b) {
+    greater(b: CIDR): boolean {
         if (this.prefix_len >= b.prefix_len) return false;
         if ((this.mask_num & b.addr_num) === this.addr_num) return true; else return false;
     }
 
-    /**
-     * Equal
-     *
-     * @param {CIDR} b - the other operand
-     * @return {boolean} */
-    equals(b) {
+    equals(b: CIDR) {
         return this.addr_num === b.addr_num && this.prefix_len === b.prefix_len;
     }
 
     /**
-     * Has common
-     *
-     * @param {CIDR} b - the other operand
-     * @return {boolean} */
-    common(b) {
+     * If the two segments covers some address in common
+     */
+    common(b: CIDR): boolean {
         return this.equals(b) || this.greater(b) || b.greater(this);
     }
 }
 
-
-/**
- * Render
- *
- * @param {CIDR} c - the CIDR
- * @param {number} idx - list index
- * */
-function RenderCIDR(c,idx) {
+function RenderCIDR(c: CIDR, idx: number) {
     return (<ListItem key={idx}>
-        <ListItemText primary={c.info()} />
+        <ListItemText primary={c.info()}/>
     </ListItem>);
 }
 
 export default function Home() {
     const [state, setState] = useState({
-        answer: []
+        answer: [] as CIDR[]
     });
     const r = useRef({
         input: ''
@@ -147,10 +120,10 @@ export default function Home() {
                 setState(new_state);
                 return;
             }
-            let ans = [CIDR.from_str(OP.at(0))];
+            let ans = [CIDR.from_str(OP[0])];
             for (let i = 1; i < OP.length; i++) {
                 let b = CIDR.from_str(OP[i]);
-                let next = [];
+                let next: CIDR[] = [];
                 for (let j = 0; j < ans.length; j++) {
                     next = next.concat(ans[j].subtract(b));
                 }
@@ -159,7 +132,7 @@ export default function Home() {
             setState({...state, answer: ans});
         }}>Calculate</Button>
         <List>
-            {state.answer.map((e,idx) => RenderCIDR(e,idx))}
+            {state.answer.map((e, idx) => RenderCIDR(e, idx))}
         </List>
     </div>);
 }
