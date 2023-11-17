@@ -1,9 +1,10 @@
 import Image from "next/image";
 import exported_tools from "./toolbox/module";
 import {Typography} from "@mui/material";
+import {ToolMeta} from "@/inlcude/tool_metadata";
+import Link from "next/link";
 
-
-function ToolCard() {
+function ToolCard({meta}: { meta: ToolMeta }) {
     return (
         <div
             className="m-4 transform transition-transform ease-in-out duration-200 hover:scale-105 hover:shadow-lg rounded-3xl border-2 border-gray-300 bg-white dark:bg-gray-800 overflow-hidden cursor-pointer select-none">
@@ -19,7 +20,7 @@ function ToolCard() {
                     draggable={false}
                 />
             </div>
-            <p className="p-2 text-center">Card 1</p>
+            <Link href={meta.route}><p className="p-2 text-center">{meta.name}</p></Link>
         </div>
     );
 }
@@ -33,34 +34,19 @@ export default function Home() {
                     exported_tools
                         .map((list, idx) => {
                             return (
-                                <ToolCard key={"card_1" + idx}/>
+                                <ToolCard meta={list} key={"card_1" + idx}/>
                             );
                         })
                 }
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
-                <ToolCard/>
+                <ToolCard meta={exported_tools[0]}/>
+                <ToolCard meta={exported_tools[0]}/>
+                <ToolCard meta={exported_tools[0]}/>
+                <ToolCard meta={exported_tools[0]}/>
+                <ToolCard meta={exported_tools[0]}/>
+                <ToolCard meta={exported_tools[0]}/>
+                <ToolCard meta={exported_tools[0]}/>
+                <ToolCard meta={exported_tools[0]}/>
+                <ToolCard meta={exported_tools[0]}/>
             </div>
         </div>
     </>;
