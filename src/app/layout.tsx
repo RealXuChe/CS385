@@ -12,9 +12,9 @@ export const metadata = {
 export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
         <html lang="en">
-        <body className={`${inter.className} h-screen`}>
-        <Navbar/>
-        <div className=" bg-gray-100 h-full flex justify-center">
+        <body className={`${inter.className} h-screen bg-gray-100`}>
+        <Navbar />
+        <div className="flex justify-center">
             <div className="w-11/12 ">
                 {children}
             </div>
