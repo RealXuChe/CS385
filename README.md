@@ -14,7 +14,7 @@ We're the Team 14, *PHENOMENON*, consisting of the following members:
 >
 > YANG YUNFEI
 >
-> CHEN YULIANG in test
+> CHEN YULIANG
 >
 > YE JINGRUI
 >
