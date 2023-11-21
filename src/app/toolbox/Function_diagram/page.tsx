@@ -35,27 +35,27 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>函数图像绘制器</h1>
+        <h1>Function Image Plotter</h1>
       </header>
       <main>
         <label>
-          输入函数表达式：
+          Input function expression:
           <input
             type="text"
             value={expression}
             onChange={(e) => setExpression(e.target.value)}
           />
         </label>
-        <button onClick={plotFunction}>绘制图像</button>
+        <button onClick={plotFunction}>Draw an image</button>
 
         <Plot
           data={data}
           layout={{
             width: 800,
             height: 400,
-            title: '函数图像',
-            xaxis: { title: 'x轴' },
-            yaxis: { title: 'y轴' },
+            title: 'Function image',
+            xaxis: { title: 'X-axis' },
+            yaxis: { title: 'Y-axis' },
           }}
         />
       </main>
