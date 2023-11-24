@@ -1,0 +1,46 @@
+body {
+  background-color: rgb(227 227 227);
+  font-size: 20px;
+  user-select: none;
+}
+
+#bit-container {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  width: 800px;
+}
+
+.box {
+  border: 2px solid black;
+  width: 15px;
+  height: 30px;
+  display: inline-block;
+  margin-right: 3px;
+  cursor: pointer;
+}
+
+.sign {
+  background-color: rgb(198 252 255);
+}
+
+.exponent {
+  background-color: rgb(160 255 174);
+}
+
+.fraction {
+  background-color: rgb(255 176 174);
+}
+
+.bin-value-container .ans-container .bin-value .ans {
+  display: inline-block;
+}
+
+#ans {
+  font-size: xx-large;
+}
+
+input {
+  background-color: transparent;
+  border: none;
+}
