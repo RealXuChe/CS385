@@ -12,17 +12,11 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.14.16",
-    "chart.js": "^4.4.0",
-    "d3": "^7.8.5",
-    "function-plot": "^1.23.3",
     "next": "14.0.1",
-    "plotly.js": "^2.27.1",
     "react": "^18",
-    "react-dom": "^18",
     "react-plotly.js": "^2.6.0"
   },
   "devDependencies": {
-    "@types/d3": "^7.4.3",
     "@types/node": "20.8.10",
     "@types/react-plotly.js": "^2.6.3",
     "autoprefixer": "^10.0.1",
