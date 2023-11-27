@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className={`${inter.className} h-screen bg-gray-100`}>
         <Navbar />
         <div className="flex justify-center">
-          <div className="w-11/12 ">{children}</div>
+          <div className="w-[108rem] ">{children}</div>
         </div>
       </body>
     </html>
