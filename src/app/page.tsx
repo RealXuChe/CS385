@@ -1,102 +1,45 @@
-import Image from "next/image";
-import title from "./icon/title.svg";
 import exported_tools from "./toolbox/module";
-import { Typography } from "@mui/material";
 import { ToolMeta } from "@/inlcude/tool_metadata";
 import Link from "next/link";
-import meta from "./toolbox/cidr-calculator/metadata";
 
-function ToolCard({ meta }: { meta: ToolMeta }) {
-  return (
-    <div
-      className="m-4 transform transition-transform ease-in-out duration-300
-            hover:scale-105 hover:shadow-md rounded-2xl bg-white dark:bg-gray-800
-            overflow-hidden cursor-pointer select-none"
-    >
-      <div className=" h-44 relative bg-amber-50">
-        <div className="w-auto h-auto">
-          <img src="cidr-icon.svg" alt="cidr" />
-        </div>
-      </div>
-      <Link href={meta.route}>
-        <p className="p-2 text-center">{meta.name}</p>
-      </Link>
-    </div>
-  );
-}
-
-function ToolCardBg1() {
-  return (
-    <div className="my-10 mx-auto ">
-      <div className="h-[12rem] w-[31rem] bg-indigo-500 rounded-2xl overflow-hidden ">
-        <div className="h-[24.3rem]  w-[24.3rem] bg-[#FF6969] rounded-full blur-sm relative right-[9rem] top-[1.5rem] "></div>
-        <div className="h-[24.3rem]  w-[24.3rem] bg-[#FFCF97] rounded-full blur-sm relative left-[11rem] bottom-[29rem]"></div>
-      </div>
-      <div
-        className="h-[12rem] w-[31rem] backdrop-filter backdrop-blur-2xl bg-[#E9ECFD]/10 rounded-2xl relative bottom-[11.25rem] right-[1rem] 
-                shadow-[0.25rem_0.25rem_0.5rem_rgba(0,0,0,0.25)] border-4 border-[#CABDBD]/20
-                ease-in-out duration-300 hover:scale-105" /*bg 透明度 10-20; border 粗细 4-6px; border 透明度20-30*/
-      ></div>
-    </div>
-  );
-}
-
-function ToolCardBg2() {
-  return (
-    <div className="my-10 mx-auto h-[12.75rem] w-[32rem] ">
-      <img src="background1.svg" alt="background" className="right-0 top-0" />
-      <div
-        className="w-[31rem] h-[12rem] rounded-xl relative bottom-[11.25rem] right-[1rem] backdrop-filter backdrop-blur-2xl bg-[#E9ECFD]/10 
-                shadow-[0.25rem_0.25rem_0.5rem_rgba(0,0,0,0.25)] border-[0.375rem] border-[#CABDBD]/20 
-                ease-in-out duration-300 hover:scale-105 " /*bg 透明度 10-20; border 粗细 4-6px; border 透明度20-30*/
-      ></div>
-    </div>
-  );
-}
-
-function ToolCardBg3({ meta }: { meta: ToolMeta }) {
-  return (
-    <div className="my-10 mx-auto h-[12rem] w-[31rem] rounded-xl">
-      <img
-        src="background1.svg"
-        alt="background"
-        className="right-0 top-0 ease-in-out duration-300 hover:scale-105"
-      />
-      <div
-        className="w-[31rem] h-[12rem] rounded-xl relative bottom-[12rem] backdrop-filter backdrop-blur-2xl bg-[#E9ECFD]/10 
-        ease-in-out duration-300 hover:shadow-[0.25rem_0.25rem_0.5rem_rgba(0,0,0,0.25)] border-[0.375rem] border-[#CABDBD]/30" /*bg 透明度 10-20; border 粗细 4-6px; border 透明度20-30*/
-      ></div>
-    </div>
-  );
-}
-
-function ToolCardBg4({ meta }: { meta: ToolMeta }) {
+function ToolCardBg({ meta }: { meta: ToolMeta }) {
   return (
     <div className="mb-16 mx-auto h-[12.75rem]">
-      <div className="h-[12rem] w-[31rem] bg-gradient-to-b from-[#6366F1]/[0.8] to-[#7073FF]/[0.3] rounded-2xl overflow-hidden "></div>
+      <div
+        className="2xl:h-[12rem] 2xl:w-[31rem] xl:h-[12rem] xl:w-[31rem] lg:h-[12rem] lg:w-[31rem] md:h-[12rem] md:w-[31rem] sm:h-[12rem] sm:w-[31rem] h-[8rem] w-[20rem]
+                   bg-gradient-to-b from-[#6366F1]/[0.8] to-[#7073FF]/[0.3] rounded-2xl overflow-hidden"
+      ></div>
+
       <Link
         href={meta.route}
-        className="relative bottom-[11.25rem] right-[1rem] "
+        className="relative 2xl:bottom-[11.25rem] 2xl:right-[1rem] xl:bottom-[11.25rem] xl:right-[1rem] lg:bottom-[11.25rem] lg:right-[1rem] md:bottom-[11.25rem] md:right-[1rem] sm:bottom-[11.25rem] sm:right-[1rem] bottom-[9rem] right-[1rem]"
       >
         <div
-          className="h-[12rem] w-[31rem] backdrop-filter backdrop-blur-md bg-[#EBEBEB]/60 rounded-2xl 
-                shadow-[0.25rem_0.25rem_0.5rem_rgba(0,0,0,0.25)] border-4 border-[#EBEBEB]/50
-                ease-in-out duration-300 hover:scale-105" /*bg 透明度 10-20; border 粗细 4-6px; border 透明度20-30*/
+          className="2xl:h-[12rem] 2xl:w-[31rem] xl:h-[12rem] xl:w-[31rem] lg:h-[12rem] lg:w-[31rem] md:h-[12rem] md:w-[31rem] sm:h-[12rem] sm:w-[31rem] h-[8rem] w-[20rem]
+                    backdrop-filter backdrop-blur-md bg-[#EBEBEB]/60 rounded-2xl
+                    shadow-[0.25rem_0.25rem_0.5rem_rgba(0,0,0,0.25)] border-4 border-[#EBEBEB]/50
+                    ease-in-out duration-300 hover:scale-105" /*bg op 10-20; border stroke 4-6px; border op-30*/
         >
           <div className="">
-            <div className="w-[11.625rem] h-[11.625rem] float-left">
+            <div className="2xl:w-[11.625rem] 2xl:h-[11.625rem] xl:w-[11.625rem] xl:h-[11.625rem] lg:w-[11.625rem] lg:h-[11.625rem] md:w-[11.625rem] md:h-[11.625rem] sm:w-[11.625rem] sm:h-[11.625rem] w-[8rem] h-[8rem] float-left">
               <img
                 src={meta.icon}
                 alt="icon"
                 className="p-6 drop-shadow-[0rem_0.125rem_0.625rem_rgba(1,6,97,0.25)]"
               />
             </div>
-            <div className="w-[18rem] float-left">
-              <p className="ml-[2rem] mt-[1.76rem] text-[1.625rem] font-semibold text-[#FFFBF5] drop-shadow-[0.125rem_0.125rem_0.125rem_rgba(1,6,97,0.25)]">
+            <div className=" 2xl:w-[18rem] xl:w-[18rem] lg:w-[18rem] md:w-[18rem] sm:w-[18rem] w-[10rem] float-left">
+              <p
+                className="2xl:ml-[2rem] 2xl:mt-[1.76rem] 2xl:text-[1.625rem] xl:ml-[2rem] xl:mt-[1.76rem] xl:text-[1.625rem] lg:ml-[2rem] lg:mt-[1.76rem] lg:text-[1.625rem] md:ml-[2rem] md:mt-[1.76rem] md:text-[1.625rem] sm:ml-[2rem] sm:mt-[1.76rem] sm:text-[1.625rem] ml-[1rem] mt-[0.75rem] text-[1rem]
+              font-semibold text-[#FFFBF5] drop-shadow-[0.125rem_0.125rem_0.125rem_rgba(1,6,97,0.25)]"
+              >
                 {meta.name}
               </p>
               <br></br>
-              <p className="ml-[2rem] text-[#FFFBF5] font-normal text-[1.19rem]  drop-shadow-[0.125rem_0.125rem_0.125rem_rgba(1,6,97,0.25)]">
+              <p
+                className="2xl:ml-[2rem] 2xl:text-[1.19rem] xl:ml-[2rem] xl:text-[1.19rem] lg:ml-[2rem] lg:text-[1.19rem] md:ml-[2rem] md:text-[1.19rem] sm:ml-[2rem] sm:text-[1.19rem] ml-[1rem] text-[0.75rem]
+              text-[#FFFBF5] font-normal drop-shadow-[0.125rem_0.125rem_0.125rem_rgba(1,6,97,0.25)]"
+              >
                 {meta.introduction}
               </p>
             </div>
@@ -109,30 +52,25 @@ function ToolCardBg4({ meta }: { meta: ToolMeta }) {
 
 export default function Home() {
   return (
-    <>
-      {/*<Typography variant="h2" className="p-8" >Toolkit Dashboard</Typography>*/}
-      {/* innner shadow frame */}
-      <div className="rounded-2xl h-screen my-7 bg-[#F4F2F4] shadow-[inset_0rem_0.25rem_0.5rem_rgba(0,0,0,0.25)]">
-        {/* title&icon */}
-        <div className="flex justify-center py-16">
-          <img src="title.svg" alt="tittle" />
-        </div>
-        {/* search input */}
-        <div className="mx-0 flex justify-center">
-          <input
-            type="text"
-            className="mx-0 px-4 h-14 rounded-2xl border-4 border-black w-8/12 hover:shadow-lg ease-in-out"
-          />
-        </div>
-        <div className="mx-auto pt-12 w-auto grid grid-flow-row auto-rows-max xl:grid-cols-3 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 justify-center"></div>
-        {/* Toolkit */}
-        <div className="mx-12  pt-12 grid xl:grid-cols-3 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 justify-center">
-          {exported_tools.map((list, idx) => {
-            return <ToolCardBg4 meta={list} key={"card_1" + idx} />;
-          })}
-          {/* <ToolCardBg4 meta={exported_tools[0]} /> */}
-        </div>
+    <div className="rounded-2xl my-7 bg-[#F4F2F4] shadow-[inset_0rem_0.25rem_0.5rem_rgba(0,0,0,0.25)]">
+      {/* title&icon */}
+      <div className="flex justify-center py-16">
+        <img src="title.svg" alt="title" />
       </div>
-    </>
+      {/* search input */}
+      <div className="mx-0 flex justify-center">
+        <input
+          type="text"
+          className="mx-0 px-4 h-14 rounded-2xl border-4 border-black w-8/12 hover:shadow-lg ease-in-out"
+        />
+      </div>
+      <div className="mx-auto pt-12 w-auto grid grid-flow-row auto-rows-max xl:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 justify-center"></div>
+      {/* Toolkit */}
+      <div className="mx-12  pt-12 w-auto grid grid-flow-row auto-rows-max 2xl:grid-cols-3 xl:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 grid-cols-1 justify-center">
+        {exported_tools.map((list, idx) => {
+          return <ToolCardBg meta={list} key={"card_1" + idx} />;
+        })}
+      </div>
+    </div>
   );
 }
