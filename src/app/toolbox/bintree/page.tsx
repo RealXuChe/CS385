@@ -28,6 +28,25 @@ class PairSet<T1, T2> extends Set<Pair<T1, T2>> {
   }
 }
 
+class Queue<T> {
+  private elements: T[] = [];
+  push(element: T): void {
+    this.elements.push(element);
+  }
+  pop(): T {
+    return this.elements.shift()!;
+  }
+  front(): T {
+    return this.elements[0];
+  }
+  empty(): boolean {
+    return this.elements.length === 0;
+  }
+  size(): number {
+    return this.elements.length;
+  }
+}
+
 const Graphviz = dynamic(() => import("graphviz-react"), { ssr: false });
 const dotHead: string =
   'graph g { graph[ordering="out" bgcolor="transparent"];';
@@ -183,18 +202,59 @@ export default function Home() {
     drawGraph();
   };
 
+  const hasCircle = () => {
+    let deg2 = new Map(deg);
+    let edges2 = new PairSet(edges);
+    edges.forEach((e) => {
+      edges2.add(new Pair(e.second, e.first));
+    });
+    let q = new Queue<string>(),
+      n = 0;
+    nodes.forEach((e) => {
+      if (deg2.get(e) == 1) q.push(e);
+      if (deg2.get(e)! > 0) ++n;
+    });
+    let cnt = 0;
+    while (!q.empty()) {
+      ++cnt;
+      let u = q.front();
+      q.pop();
+      edges2.forEach((e) => {
+        if (e.first == u) {
+          let v = e.second;
+          deg2.set(v, deg2.get(v)! - 1);
+          if (deg2.get(v) == 1) q.push(v);
+        }
+      });
+    }
+    return cnt < n;
+  };
+
   const addEdge = () => {
-    if (EdgeToAddU == "" || EdgeToAddV == "") {
-      showAlert("Invalid input: nodes cannot be empty!");
-      return;
-    }
-    if (EdgeToAddU == EdgeToAddV) {
-      showAlert("Invalid input: nodes cannot repeat!");
-      return;
-    }
-    if (edges.has(new Pair(EdgeToAddV, EdgeToAddU))) return;
-    edges.add(new Pair(EdgeToAddU, EdgeToAddV));
     setEdgeToAddU(""), setEdgeToAddV("");
+    if (EdgeToAddU == "" || EdgeToAddV == "")
+      return showAlert("Invalid input: nodes cannot be empty!");
+    if (EdgeToAddU == EdgeToAddV)
+      return showAlert("Invalid input: nodes cannot repeat!");
+    if (edges.has(new Pair(EdgeToAddU, EdgeToAddV)))
+      return showAlert("Invalid input: repeated edge.");
+    if (root == "") root = EdgeToAddU;
+
+    // check degrees
+    if (EdgeToAddU == root && deg.has(EdgeToAddU) && deg.get(EdgeToAddU)! >= 2)
+      return showAlert("Not a binary tree.");
+    if (EdgeToAddU != root && deg.has(EdgeToAddU) && deg.get(EdgeToAddU)! >= 3)
+      return showAlert("Not a binary tree.");
+    if (EdgeToAddV == root && deg.has(EdgeToAddV) && deg.get(EdgeToAddV)! >= 2)
+      return showAlert("Not a binary tree.");
+    if (EdgeToAddV != root && deg.has(EdgeToAddV) && deg.get(EdgeToAddV)! >= 3)
+      return showAlert("Not a binary tree.");
+
+    let edgesBak = new PairSet(edges);
+    let degBak = new Map(deg);
+    let nodesBak = new Set(nodes);
+
+    edges.add(new Pair(EdgeToAddU, EdgeToAddV));
 
     // if the edge contains new nodes, create nodes first
     nodes.add(EdgeToAddU);
@@ -205,29 +265,33 @@ export default function Home() {
     deg.set(EdgeToAddU, deg.get(EdgeToAddU)! + 1);
     deg.set(EdgeToAddV, deg.get(EdgeToAddV)! + 1);
 
+    if (hasCircle()) {
+      showAlert("Invalid input: has a circle.");
+      edges = new PairSet(edgesBak);
+      deg = new Map(degBak);
+      nodes = new Set(nodesBak);
+      return;
+    }
+
     drawGraph();
   };
 
   const delEdge = () => {
-    if (EdgeToDelU == "" || EdgeToDelV == "") {
-      showAlert("Invalid input: nodes cannot be empty!");
-      return;
-    }
-    if (EdgeToDelU == EdgeToDelV) {
-      showAlert("Invalid input: nodes cannot repeat!");
-      return;
-    }
+    setEdgeToDelU(""), setEdgeToDelV("");
+    if (EdgeToDelU == "" || EdgeToDelV == "")
+      return showAlert("Invalid input: nodes cannot be empty!");
+    if (EdgeToDelU == EdgeToDelV)
+      return showAlert("Invalid input: nodes cannot repeat!");
     if (
-      !edges.has(new Pair<string, string>(EdgeToDelU, EdgeToDelV)) &&
-      edges.has(new Pair<string, string>(EdgeToDelV, EdgeToDelU))
+      !edges.has(new Pair(EdgeToDelU, EdgeToDelV)) &&
+      edges.has(new Pair(EdgeToDelV, EdgeToDelU))
     )
-      actualDelEdge(new Pair<string, string>(EdgeToDelV, EdgeToDelU));
+      actualDelEdge(new Pair(EdgeToDelV, EdgeToDelU));
     else if (
-      edges.has(new Pair<string, string>(EdgeToDelU, EdgeToDelV)) &&
-      !edges.has(new Pair<string, string>(EdgeToDelV, EdgeToDelU))
+      edges.has(new Pair(EdgeToDelU, EdgeToDelV)) &&
+      !edges.has(new Pair(EdgeToDelV, EdgeToDelU))
     )
       actualDelEdge(new Pair<string, string>(EdgeToDelU, EdgeToDelV));
-    setEdgeToDelU(""), setEdgeToDelV("");
 
     drawGraph();
   };
