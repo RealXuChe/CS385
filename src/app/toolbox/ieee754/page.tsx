@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, MouseEvent, useRef, useState } from "react";
-import { Button, List, ListItem, ListItemText, TextField } from "@mui/material";
+import React, { MouseEvent, useState } from "react";
+import { Grid, Paper, Typography, TextField } from "@mui/material";
 
 require("./IEEE754.css");
 
@@ -79,7 +79,6 @@ export default function Home() {
     event.currentTarget.innerText = String(
       1 ^ parseInt(event.currentTarget.innerText),
     );
-
     updateThreeParts();
     // compute the fp_number and display the final ans
     var str = getBoxRange(0, 31);
@@ -94,75 +93,114 @@ export default function Home() {
     setFinalAns(String(ans));
   };
 
-  const signBox = Array.from({ length: signLen }, (_, index) => (
+  const renderBox = (value: string, index: number, type: string) => (
     <div
       key={index}
-      id={"bit-" + String(index)}
-      className="box sign"
+      id={`bit-${index}`}
+      className={`monospace box ${type} ${value === "1" ? "value-one" : ""}`}
       onClick={flipAndUpdate}
     >
-      0
+      {value}
     </div>
-  ));
-  const expBoxes = Array.from({ length: expLen }, (_, index) => (
-    <div
-      key={index}
-      id={"bit-" + String(signLen + index)}
-      className="box exponent"
-      onClick={flipAndUpdate}
-    >
-      0
-    </div>
-  ));
-  const fracBoxes = Array.from({ length: fracLen }, (_, index) => (
-    <div
-      key={index}
-      id={"bit-" + String(signLen + expLen + index)}
-      className="box fraction"
-      onClick={flipAndUpdate}
-    >
-      0
-    </div>
-  ));
+  );
+
+  const signBox = signValue
+    .split("")
+    .map((value, index) => renderBox(value, index, "sign"));
+  const expBoxes = expValues
+    .split("")
+    .map((value, index) => renderBox(value, signLen + index, "exponent"));
+  const fracBoxes = fracValues
+    .split("")
+    .map((value, index) =>
+      renderBox(value, signLen + expLen + index, "fraction"),
+    );
 
   return (
-    <div className="justdiv">
-      <div id="bit-container">
-        {signBox}
-        {expBoxes}
-        {fracBoxes}
-      </div>
+    <div style={{ padding: 20 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Paper style={{ padding: 20, backgroundColor: "rgb(227, 227, 227)" }}>
+            <Typography variant="h6" sx={{ userSelect: "none" }}>
+              Bits in memory
+            </Typography>
+            <div
+              style={{
+                overflowX: "auto",
+                whiteSpace: "nowrap",
+                padding: "10px",
+                width: "100%",
+              }}
+            >
+              <div
+                id="bit-container"
+                style={{ margin: "auto", textAlign: "center" }}
+              >
+                {signBox}
+                {expBoxes}
+                {fracBoxes}
+              </div>
+            </div>
+          </Paper>
+        </Grid>
 
-      <hr />
+        <Grid item xs={12} md={4}>
+          <Paper style={{ padding: "20px", backgroundColor: "#eee" }}>
+            <Typography variant="subtitle1">Sign bit:</Typography>
+            <Paper style={{ padding: "10px", backgroundColor: "#f5f5f5" }}>
+              <Typography className="monospace" variant="body1">
+                {signValue}
+              </Typography>
+            </Paper>
+          </Paper>
+        </Grid>
 
-      <div id="bin-value-container">
-        Sign bit:&nbsp;
-        <div id="signV" className="bin-value">
-          {signValue}
-        </div>
-        <br />
-        Exponent bits:&nbsp;
-        <div id="expV" className="bin-value">
-          {expValues}
-        </div>
-        <br />
-        Fraction bits:&nbsp;
-        <div id="fracV" className="bin-value">
-          {fracValues}
-        </div>
-      </div>
+        <Grid item xs={12} md={4}>
+          <Paper style={{ padding: "20px", backgroundColor: "#eee" }}>
+            <Typography variant="subtitle1">Exponent bits:</Typography>
+            <Paper style={{ padding: "10px", backgroundColor: "#f5f5f5" }}>
+              <Typography className="monospace" variant="body1">
+                {expValues}
+              </Typography>
+            </Paper>
+          </Paper>
+        </Grid>
 
-      <hr />
+        <Grid item xs={12} md={4}>
+          <Paper style={{ padding: "20px", backgroundColor: "#eee" }}>
+            <Typography variant="subtitle1">Fraction bits:</Typography>
+            <Paper style={{ padding: "10px", backgroundColor: "#f5f5f5" }}>
+              <Typography className="monospace" variant="body1">
+                {fracValues}
+              </Typography>
+            </Paper>
+          </Paper>
+        </Grid>
 
-      <div id="ans-container">
-        Final value:&nbsp;
-        <TextField
-          type="text"
-          id="ans"
-          value={finalAns}
-          onChange={handleUserInput}
-        />
-      </div>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            type="text"
+            value={finalAns}
+            onChange={handleUserInput}
+            InputProps={{
+              inputProps: { style: { textAlign: "center" } },
+            }}
+            sx={{
+              backgroundColor: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              padding: "8px",
+              "&:hover": {
+                backgroundColor: "#f9f9f9",
+              },
+              "& .Mui-focused": {
+                borderColor: "#3f51b5",
+              },
+            }}
+          />
+        </Grid>
+      </Grid>
     </div>
   );
 }
