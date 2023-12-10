@@ -1,12 +1,6 @@
 "use client";
-import { TextField, Box, Button } from "@mui/material";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from "@mui/material";
+import { TextField, Box, Button, Grid, Paper, Typography } from "@mui/material";
+import { Snackbar, Alert } from "@mui/material";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 
@@ -35,7 +29,8 @@ class PairSet<T1, T2> extends Set<Pair<T1, T2>> {
 }
 
 const Graphviz = dynamic(() => import("graphviz-react"), { ssr: false });
-const dotHead: string = 'graph g { graph[ordering="out"];';
+const dotHead: string =
+  'graph g { graph[ordering="out" bgcolor="transparent"];';
 const dotTail: string = ' nullnode[style="invis"]; }';
 let nodes = new Set<string>();
 let edges = new PairSet<string, string>();
@@ -238,74 +233,142 @@ export default function Home() {
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      minHeight="100vh"
-    >
-      <Box mt={2}>
-        <TextField
-          type="text"
-          id="nodeToAdd"
-          value={nodeToAdd}
-          onChange={handleOnChangeOfAdd}
-        />
-        <Button onClick={addNode}>Add a node</Button>
-      </Box>
-      <Box mt={2}>
-        <TextField
-          type="text"
-          id="nodeToDel"
-          value={nodeToDel}
-          onChange={handleOnChangeOfDel}
-        />
-        <Button onClick={delNode}>Delete a node</Button>
-      </Box>
-      <Box mt={2}>
-        <TextField
-          type="text"
-          id="edgeToAddU"
-          value={EdgeToAddU}
-          onChange={handleOnChangeOfAddU}
-        />
-        <TextField
-          type="text"
-          id="edgeToAddV"
-          value={EdgeToAddV}
-          onChange={handleOnChangeOfAddV}
-        />
-        <Button onClick={addEdge}>Add an edge</Button>
-      </Box>
-      <Box mt={2}>
-        <TextField
-          type="text"
-          id="edgeToDelU"
-          value={EdgeToDelU}
-          onChange={handleOnChangeOfDelU}
-        />
-        <TextField
-          type="text"
-          id="edgeToDelV"
-          value={EdgeToDelV}
-          onChange={handleOnChangeOfDelV}
-        />
-        <Button onClick={delEdge}>Delete an edge</Button>
-      </Box>
-
-      <Graphviz dot={dot} className="p-8" />
-
-      <div>
-        <Dialog open={openAlert} onClose={hideAlert}>
-          <DialogTitle>Error</DialogTitle>
-          <DialogContent>
-            <DialogContentText>{alertMessage}</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={hideAlert}>Close</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+    <Box display="flex" flexDirection="column" minHeight="100vh" padding={2}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            p={2}
+            border={1}
+            borderRadius={2}
+            borderColor="grey.300"
+            sx={{ height: "100%", width: "100%" }}
+          >
+            <Paper elevation={3} sx={{ p: 2, mb: 4, width: "100%" }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Node Operations
+              </Typography>
+              <TextField
+                fullWidth
+                type="text"
+                label="Add Node"
+                id="nodeToAdd"
+                value={nodeToAdd}
+                onChange={handleOnChangeOfAdd}
+                margin="normal"
+              />
+              <Box display="flex" justifyContent="center" sx={{ mt: 1 }}>
+                <Button variant="outlined" color="primary" onClick={addNode}>
+                  Add Node
+                </Button>
+              </Box>
+              <TextField
+                fullWidth
+                type="text"
+                label="Delete Node"
+                id="nodeToDel"
+                value={nodeToDel}
+                onChange={handleOnChangeOfDel}
+                margin="normal"
+              />
+              <Box display="flex" justifyContent="center" sx={{ mt: 1 }}>
+                <Button variant="outlined" color="secondary" onClick={delNode}>
+                  Delete Node
+                </Button>
+              </Box>
+            </Paper>
+            <Paper elevation={3} sx={{ p: 2, width: "100%" }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Edge Operations
+              </Typography>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                width="100%"
+                mt={2}
+              >
+                <TextField
+                  fullWidth
+                  type="text"
+                  label="Add Edge From"
+                  id="edgeToAddU"
+                  value={EdgeToAddU}
+                  onChange={handleOnChangeOfAddU}
+                  margin="normal"
+                  sx={{ mr: 1 }}
+                />
+                <TextField
+                  fullWidth
+                  type="text"
+                  label="Add Edge To"
+                  id="edgeToAddV"
+                  value={EdgeToAddV}
+                  onChange={handleOnChangeOfAddV}
+                  margin="normal"
+                />
+              </Box>
+              <Box display="flex" justifyContent="center" sx={{ mt: 1 }}>
+                <Button variant="outlined" color="primary" onClick={addEdge}>
+                  Add Edge
+                </Button>
+              </Box>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                width="100%"
+                mt={2}
+              >
+                <TextField
+                  fullWidth
+                  type="text"
+                  label="Delete Edge From"
+                  id="edgeToDelU"
+                  value={EdgeToDelU}
+                  onChange={handleOnChangeOfDelU}
+                  margin="normal"
+                  sx={{ mr: 1 }}
+                />
+                <TextField
+                  fullWidth
+                  type="text"
+                  label="Delete Edge To"
+                  id="edgeToDelV"
+                  value={EdgeToDelV}
+                  onChange={handleOnChangeOfDelV}
+                  margin="normal"
+                />
+              </Box>
+              <Box display="flex" justifyContent="center" sx={{ mt: 1 }}>
+                <Button variant="outlined" color="secondary" onClick={delEdge}>
+                  Delete Edge
+                </Button>
+              </Box>
+            </Paper>
+          </Box>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            p={2}
+            border={1}
+            borderRadius={2}
+            borderColor="grey.300"
+            sx={{ height: "100%", width: "100%" }}
+          >
+            <Graphviz
+              dot={dot}
+              options={{ height: "600", width: "100%", zoom: false, fit: true }}
+            />
+          </Box>
+        </Grid>
+      </Grid>
+      <Snackbar open={openAlert} autoHideDuration={6000} onClose={hideAlert}>
+        <Alert onClose={hideAlert} severity="error" sx={{ width: "100%" }}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
