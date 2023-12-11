@@ -1,39 +1,51 @@
+.monospace {
+  font-family: "Courier New", Courier, monospace;
+}
+
 body {
   background-color: rgb(227 227 227);
   font-size: 20px;
   user-select: none;
 }
 
-#bit-container {
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  width: 800px;
-}
-
 .box {
   border: 2px solid black;
-  width: 15px;
+  flex: 0 0 calc((100% - 66px) / 32);
   height: 30px;
-  display: inline-block;
-  margin-right: 3px;
   cursor: pointer;
+  margin: 1px;
+  text-align: center;
+  transition:
+    background-color 0.3s,
+    box-shadow 0.3s;
 }
 
 .sign {
   background-color: rgb(198 252 255);
 }
 
+.sign:hover {
+  background-color: rgb(148 222 225);
+}
+
 .exponent {
   background-color: rgb(160 255 174);
+}
+
+.exponent:hover {
+  background-color: rgb(110 225 134);
 }
 
 .fraction {
   background-color: rgb(255 176 174);
 }
 
-.bin-value-container .ans-container .bin-value .ans {
-  display: inline-block;
+.fraction:hover {
+  background-color: rgb(215 136 134);
+}
+
+.value-one {
+  box-shadow: 0 0 10px rgb(0 0 0 / 80%);
 }
 
 #ans {
@@ -43,4 +55,5 @@ body {
 input {
   background-color: transparent;
   border: none;
+  width: 100%;
 }
