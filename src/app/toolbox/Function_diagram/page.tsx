@@ -50,14 +50,6 @@ const Home: React.FC = () => {
       eventData['xaxis.range[1]']
     ];
 
-    alert(
-      'ZOOM!' + '\n\n' +
-      'Event data:' + '\n' +
-      JSON.stringify(eventData) + '\n\n' +
-      'x-axis start:' + xRange[0] + '\n' +
-      'x-axis end:' + xRange[1]
-    );
-
     plotFunction(xRange);
   };
 
