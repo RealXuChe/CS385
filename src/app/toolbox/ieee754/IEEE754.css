@@ -10,9 +10,9 @@ body {
 
 #bit-container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: nowrap;
-  max-width: 100%;
+  max-width: 800px;
   margin: 0 auto;
   padding: 10px;
 }
