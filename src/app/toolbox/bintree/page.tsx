@@ -1,12 +1,6 @@
 "use client";
-import { TextField, Box, Button } from "@mui/material";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from "@mui/material";
+import { TextField, Box, Button, Grid, Paper, Typography } from "@mui/material";
+import { Snackbar, Alert } from "@mui/material";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 
@@ -34,8 +28,28 @@ class PairSet<T1, T2> extends Set<Pair<T1, T2>> {
   }
 }
 
+class Queue<T> {
+  private elements: T[] = [];
+  push(element: T): void {
+    this.elements.push(element);
+  }
+  pop(): T {
+    return this.elements.shift()!;
+  }
+  front(): T {
+    return this.elements[0];
+  }
+  empty(): boolean {
+    return this.elements.length === 0;
+  }
+  size(): number {
+    return this.elements.length;
+  }
+}
+
 const Graphviz = dynamic(() => import("graphviz-react"), { ssr: false });
-const dotHead: string = 'graph g { graph[ordering="out"];';
+const dotHead: string =
+  'graph g { graph[ordering="out" bgcolor="transparent"];';
 const dotTail: string = ' nullnode[style="invis"]; }';
 let nodes = new Set<string>();
 let edges = new PairSet<string, string>();
@@ -188,18 +202,59 @@ export default function Home() {
     drawGraph();
   };
 
+  const hasCircle = () => {
+    let deg2 = new Map(deg);
+    let edges2 = new PairSet(edges);
+    edges.forEach((e) => {
+      edges2.add(new Pair(e.second, e.first));
+    });
+    let q = new Queue<string>(),
+      n = 0;
+    nodes.forEach((e) => {
+      if (deg2.get(e) == 1) q.push(e);
+      if (deg2.get(e)! > 0) ++n;
+    });
+    let cnt = 0;
+    while (!q.empty()) {
+      ++cnt;
+      let u = q.front();
+      q.pop();
+      edges2.forEach((e) => {
+        if (e.first == u) {
+          let v = e.second;
+          deg2.set(v, deg2.get(v)! - 1);
+          if (deg2.get(v) == 1) q.push(v);
+        }
+      });
+    }
+    return cnt < n;
+  };
+
   const addEdge = () => {
-    if (EdgeToAddU == "" || EdgeToAddV == "") {
-      showAlert("Invalid input: nodes cannot be empty!");
-      return;
-    }
-    if (EdgeToAddU == EdgeToAddV) {
-      showAlert("Invalid input: nodes cannot repeat!");
-      return;
-    }
-    if (edges.has(new Pair(EdgeToAddV, EdgeToAddU))) return;
-    edges.add(new Pair(EdgeToAddU, EdgeToAddV));
     setEdgeToAddU(""), setEdgeToAddV("");
+    if (EdgeToAddU == "" || EdgeToAddV == "")
+      return showAlert("Invalid input: nodes cannot be empty!");
+    if (EdgeToAddU == EdgeToAddV)
+      return showAlert("Invalid input: nodes cannot repeat!");
+    if (edges.has(new Pair(EdgeToAddU, EdgeToAddV)))
+      return showAlert("Invalid input: repeated edge.");
+    if (root == "") root = EdgeToAddU;
+
+    // check degrees
+    if (EdgeToAddU == root && deg.has(EdgeToAddU) && deg.get(EdgeToAddU)! >= 2)
+      return showAlert("Not a binary tree.");
+    if (EdgeToAddU != root && deg.has(EdgeToAddU) && deg.get(EdgeToAddU)! >= 3)
+      return showAlert("Not a binary tree.");
+    if (EdgeToAddV == root && deg.has(EdgeToAddV) && deg.get(EdgeToAddV)! >= 2)
+      return showAlert("Not a binary tree.");
+    if (EdgeToAddV != root && deg.has(EdgeToAddV) && deg.get(EdgeToAddV)! >= 3)
+      return showAlert("Not a binary tree.");
+
+    let edgesBak = new PairSet(edges);
+    let degBak = new Map(deg);
+    let nodesBak = new Set(nodes);
+
+    edges.add(new Pair(EdgeToAddU, EdgeToAddV));
 
     // if the edge contains new nodes, create nodes first
     nodes.add(EdgeToAddU);
@@ -210,102 +265,174 @@ export default function Home() {
     deg.set(EdgeToAddU, deg.get(EdgeToAddU)! + 1);
     deg.set(EdgeToAddV, deg.get(EdgeToAddV)! + 1);
 
+    if (hasCircle()) {
+      showAlert("Invalid input: has a circle.");
+      edges = new PairSet(edgesBak);
+      deg = new Map(degBak);
+      nodes = new Set(nodesBak);
+      return;
+    }
+
     drawGraph();
   };
 
   const delEdge = () => {
-    if (EdgeToDelU == "" || EdgeToDelV == "") {
-      showAlert("Invalid input: nodes cannot be empty!");
-      return;
-    }
-    if (EdgeToDelU == EdgeToDelV) {
-      showAlert("Invalid input: nodes cannot repeat!");
-      return;
-    }
+    setEdgeToDelU(""), setEdgeToDelV("");
+    if (EdgeToDelU == "" || EdgeToDelV == "")
+      return showAlert("Invalid input: nodes cannot be empty!");
+    if (EdgeToDelU == EdgeToDelV)
+      return showAlert("Invalid input: nodes cannot repeat!");
     if (
-      !edges.has(new Pair<string, string>(EdgeToDelU, EdgeToDelV)) &&
-      edges.has(new Pair<string, string>(EdgeToDelV, EdgeToDelU))
+      !edges.has(new Pair(EdgeToDelU, EdgeToDelV)) &&
+      edges.has(new Pair(EdgeToDelV, EdgeToDelU))
     )
-      actualDelEdge(new Pair<string, string>(EdgeToDelV, EdgeToDelU));
+      actualDelEdge(new Pair(EdgeToDelV, EdgeToDelU));
     else if (
-      edges.has(new Pair<string, string>(EdgeToDelU, EdgeToDelV)) &&
-      !edges.has(new Pair<string, string>(EdgeToDelV, EdgeToDelU))
+      edges.has(new Pair(EdgeToDelU, EdgeToDelV)) &&
+      !edges.has(new Pair(EdgeToDelV, EdgeToDelU))
     )
       actualDelEdge(new Pair<string, string>(EdgeToDelU, EdgeToDelV));
-    setEdgeToDelU(""), setEdgeToDelV("");
 
     drawGraph();
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      minHeight="100vh"
-    >
-      <Box mt={2}>
-        <TextField
-          type="text"
-          id="nodeToAdd"
-          value={nodeToAdd}
-          onChange={handleOnChangeOfAdd}
-        />
-        <Button onClick={addNode}>Add a node</Button>
-      </Box>
-      <Box mt={2}>
-        <TextField
-          type="text"
-          id="nodeToDel"
-          value={nodeToDel}
-          onChange={handleOnChangeOfDel}
-        />
-        <Button onClick={delNode}>Delete a node</Button>
-      </Box>
-      <Box mt={2}>
-        <TextField
-          type="text"
-          id="edgeToAddU"
-          value={EdgeToAddU}
-          onChange={handleOnChangeOfAddU}
-        />
-        <TextField
-          type="text"
-          id="edgeToAddV"
-          value={EdgeToAddV}
-          onChange={handleOnChangeOfAddV}
-        />
-        <Button onClick={addEdge}>Add an edge</Button>
-      </Box>
-      <Box mt={2}>
-        <TextField
-          type="text"
-          id="edgeToDelU"
-          value={EdgeToDelU}
-          onChange={handleOnChangeOfDelU}
-        />
-        <TextField
-          type="text"
-          id="edgeToDelV"
-          value={EdgeToDelV}
-          onChange={handleOnChangeOfDelV}
-        />
-        <Button onClick={delEdge}>Delete an edge</Button>
-      </Box>
-
-      <Graphviz dot={dot} className="p-8" />
-
-      <div>
-        <Dialog open={openAlert} onClose={hideAlert}>
-          <DialogTitle>Error</DialogTitle>
-          <DialogContent>
-            <DialogContentText>{alertMessage}</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={hideAlert}>Close</Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+    <Box display="flex" flexDirection="column" minHeight="100vh" padding={2}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            p={2}
+            border={1}
+            borderRadius={2}
+            borderColor="grey.300"
+            sx={{ height: "100%", width: "100%" }}
+          >
+            <Paper elevation={3} sx={{ p: 2, mb: 4, width: "100%" }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Node Operations
+              </Typography>
+              <TextField
+                fullWidth
+                type="text"
+                label="Add Node"
+                id="nodeToAdd"
+                value={nodeToAdd}
+                onChange={handleOnChangeOfAdd}
+                margin="normal"
+              />
+              <Box display="flex" justifyContent="center" sx={{ mt: 1 }}>
+                <Button variant="outlined" color="primary" onClick={addNode}>
+                  Add Node
+                </Button>
+              </Box>
+              <TextField
+                fullWidth
+                type="text"
+                label="Delete Node"
+                id="nodeToDel"
+                value={nodeToDel}
+                onChange={handleOnChangeOfDel}
+                margin="normal"
+              />
+              <Box display="flex" justifyContent="center" sx={{ mt: 1 }}>
+                <Button variant="outlined" color="secondary" onClick={delNode}>
+                  Delete Node
+                </Button>
+              </Box>
+            </Paper>
+            <Paper elevation={3} sx={{ p: 2, width: "100%" }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Edge Operations
+              </Typography>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                width="100%"
+                mt={2}
+              >
+                <TextField
+                  fullWidth
+                  type="text"
+                  label="Add Edge From"
+                  id="edgeToAddU"
+                  value={EdgeToAddU}
+                  onChange={handleOnChangeOfAddU}
+                  margin="normal"
+                  sx={{ mr: 1 }}
+                />
+                <TextField
+                  fullWidth
+                  type="text"
+                  label="Add Edge To"
+                  id="edgeToAddV"
+                  value={EdgeToAddV}
+                  onChange={handleOnChangeOfAddV}
+                  margin="normal"
+                />
+              </Box>
+              <Box display="flex" justifyContent="center" sx={{ mt: 1 }}>
+                <Button variant="outlined" color="primary" onClick={addEdge}>
+                  Add Edge
+                </Button>
+              </Box>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                width="100%"
+                mt={2}
+              >
+                <TextField
+                  fullWidth
+                  type="text"
+                  label="Delete Edge From"
+                  id="edgeToDelU"
+                  value={EdgeToDelU}
+                  onChange={handleOnChangeOfDelU}
+                  margin="normal"
+                  sx={{ mr: 1 }}
+                />
+                <TextField
+                  fullWidth
+                  type="text"
+                  label="Delete Edge To"
+                  id="edgeToDelV"
+                  value={EdgeToDelV}
+                  onChange={handleOnChangeOfDelV}
+                  margin="normal"
+                />
+              </Box>
+              <Box display="flex" justifyContent="center" sx={{ mt: 1 }}>
+                <Button variant="outlined" color="secondary" onClick={delEdge}>
+                  Delete Edge
+                </Button>
+              </Box>
+            </Paper>
+          </Box>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            p={2}
+            border={1}
+            borderRadius={2}
+            borderColor="grey.300"
+            sx={{ height: "100%", width: "100%" }}
+          >
+            <Graphviz
+              dot={dot}
+              options={{ height: "600", width: "100%", zoom: false, fit: true }}
+            />
+          </Box>
+        </Grid>
+      </Grid>
+      <Snackbar open={openAlert} autoHideDuration={6000} onClose={hideAlert}>
+        <Alert onClose={hideAlert} severity="error" sx={{ width: "100%" }}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
