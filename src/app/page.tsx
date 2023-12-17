@@ -4,7 +4,7 @@ import Link from "next/link";
 
 function ToolCardBg({ meta }: { meta: ToolMeta }) {
   return (
-    <div className="mb-16 mx-auto h-[12.75rem]">
+    <div className="2xl:mb-16 xl:mb-16 lg:mb-16 md:mb-16 sm:mb-16 mb-8 2xl:h-[12.75rem] xl:h-[12.75rem] lg:h-[12.75rem] md:h-[12.75rem] sm:h-[12.75rem] h-[8.75rem] mx-auto">
       <div
         className="2xl:h-[12rem] 2xl:w-[31rem] xl:h-[12rem] xl:w-[31rem] lg:h-[12rem] lg:w-[31rem] md:h-[12rem] md:w-[31rem] sm:h-[12rem] sm:w-[31rem] h-[8rem] w-[20rem]
                    bg-gradient-to-b from-[#6366F1]/[0.8] to-[#7073FF]/[0.3] rounded-2xl overflow-hidden"
@@ -12,7 +12,7 @@ function ToolCardBg({ meta }: { meta: ToolMeta }) {
 
       <Link
         href={meta.route}
-        className="relative 2xl:bottom-[11.25rem] 2xl:right-[1rem] xl:bottom-[11.25rem] xl:right-[1rem] lg:bottom-[11.25rem] lg:right-[1rem] md:bottom-[11.25rem] md:right-[1rem] sm:bottom-[11.25rem] sm:right-[1rem] bottom-[9rem] right-[1rem]"
+        className="relative 2xl:bottom-[11.25rem] 2xl:right-[1rem] xl:bottom-[11.25rem] xl:right-[1rem] lg:bottom-[11.25rem] lg:right-[1rem] md:bottom-[11.25rem] md:right-[1rem] sm:bottom-[11.25rem] sm:right-[1rem] bottom-[7.25rem] right-[0.8rem]"
       >
         <div
           className="2xl:h-[12rem] 2xl:w-[31rem] xl:h-[12rem] xl:w-[31rem] lg:h-[12rem] lg:w-[31rem] md:h-[12rem] md:w-[31rem] sm:h-[12rem] sm:w-[31rem] h-[8rem] w-[20rem]
@@ -64,9 +64,8 @@ export default function Home() {
           className="mx-0 px-4 h-14 rounded-2xl border-4 border-black w-8/12 hover:shadow-lg ease-in-out"
         />
       </div>
-      <div className="mx-auto pt-12 w-auto grid grid-flow-row auto-rows-max xl:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 justify-center"></div>
       {/* Toolkit */}
-      <div className="mx-12  pt-12 w-auto grid grid-flow-row auto-rows-max 2xl:grid-cols-3 xl:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1 grid-cols-1 justify-center">
+      <div className="flex mx-12  pt-12 w-auto grid grid-flow-row auto-rows-max desktop:grid-cols-3 xl:grid-cols-2 lg:grid-cols-1 sm:grid-cols-1 grid-cols-1 justify-center">
         {exported_tools.map((list, idx) => {
           return <ToolCardBg meta={list} key={"card_1" + idx} />;
         })}

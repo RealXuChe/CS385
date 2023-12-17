@@ -158,7 +158,7 @@ export default function Signin() {
               color={"primary"}
               className="rounded-full bg-indigo-500 px-8"
             >
-              <p className="text-[1.6rem] text-[#FFFFFF] font-mono">sign in</p>
+              <p className="text-[1.6rem] text-[#FFFFFF]">sign in</p>
             </Button>
           </ThemeProvider>
         </div>
