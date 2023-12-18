@@ -109,7 +109,7 @@ export default function Signup() {
         <div className="flex justify-center mx-auto mt-[2rem] rounded-xl">
           <ThemeProvider theme={inputTheme}>
             <TextField
-              label="Emailaddress"
+              label="Email Address"
               required={true}
               className=" w-[24.5rem]"
             ></TextField>
