@@ -80,13 +80,13 @@ export default function Signup() {
   return (
     <div>
       <div
-        className="flex flex-shrink-0 justify-center mx-auto w-[30rem] h-[43.4rem] rounded-2xl mt-20
+        className="flex flex-shrink-0 justify-center mx-auto w-[30rem] h-[42rem] rounded-2xl mt-20
             bg-gradient-to-r from-pink-600/30 via-purple-600/30 to-indigo-500/30
             blur-[3.125rem]
             "
       ></div>
       <div
-        className="flex flex-shrink-0 flex-col mx-auto w-[30rem] h-[43.4rem] rounded-2xl
+        className="flex flex-shrink-0 flex-col mx-auto w-[30rem] h-[42rem] rounded-2xl
             relative bottom-[43.4rem]
             bg-[#F4F4F4]/40 border-4 border-[#FFFAFA]/20"
       >
@@ -96,7 +96,7 @@ export default function Signup() {
           className="w-[16rrem] h-[2rem] mt-[3.125rem]"
         />
         <div
-          className="flex justify-center mx-auto mt-[2.12rem] text-[2rem] font-bold
+          className="flex justify-center mx-auto mt-[1.5rem] text-[2rem] font-bold
                 text-transparent bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-500 bg-clip-text"
         >
           Sign up
