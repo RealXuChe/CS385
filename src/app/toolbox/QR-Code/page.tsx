@@ -5,7 +5,11 @@ import QRCode from "qrcode.react";
 import Image from "next/image";
 
 export default function Home() {
+  function qrCodeGenerate() {
+    setInputText(text);
+  }
   const [text, setText] = useState("");
+  const [inputText, setInputText] = useState("");
   const [showQRCode, setShowQRCode] = useState(false);
   const qrCodeRef = useRef(null);
   return (
@@ -21,6 +25,7 @@ export default function Home() {
         <Button
           onClick={() => {
             setShowQRCode(true);
+            qrCodeGenerate();
           }}
         >
           Generate QR Code
@@ -30,7 +35,7 @@ export default function Home() {
         {showQRCode && (
           <div ref={qrCodeRef}>
             {/* eslint-disable-next-line react/jsx-no-undef */}
-            <QRCode value={text} />
+            <QRCode value={inputText} />
           </div>
         )}
         {!showQRCode && (
