@@ -1,5 +1,5 @@
 "use client";
-import React, { MouseEvent, useState } from "react";
+import React, { MouseEvent, useState, useEffect } from "react";
 import { Grid, Paper, Typography, TextField } from "@mui/material";
 
 require("./IEEE754.css");
@@ -40,6 +40,20 @@ export default function Home() {
     setFracValues(updatedFracValues);
   };
 
+  const setBoxes = (nowText: string) => {
+    const buffer = new ArrayBuffer(4);
+    const float32Arr = new Float32Array(buffer);
+    const uint32Array = new Uint32Array(buffer);
+    float32Arr[0] = parseFloat(nowText);
+    const integerValue = uint32Array[0];
+    const integerBitsHex = integerValue.toString(16);
+    let integerBitsBin = integerValue.toString(2);
+    while (integerBitsBin.length < tot) integerBitsBin = "0" + integerBitsBin;
+    // console.log(integerValue, integerBitsHex, integerBitsBin);
+
+    for (let i = 0; i < tot; ++i) setNthBox(i, integerBitsBin[i]);
+  };
+
   const handleUserInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     let nowText = event.target.value;
     if (nowText == "") nowText = "0";
@@ -60,18 +74,7 @@ export default function Home() {
     if (!special && isNaN(Number(nowText))) return;
 
     setFinalAns(nowText);
-
-    const buffer = new ArrayBuffer(4);
-    const float32Arr = new Float32Array(buffer);
-    const uint32Array = new Uint32Array(buffer);
-    float32Arr[0] = parseFloat(nowText);
-    const integerValue = uint32Array[0];
-    const integerBitsHex = integerValue.toString(16);
-    let integerBitsBin = integerValue.toString(2);
-    while (integerBitsBin.length < tot) integerBitsBin = "0" + integerBitsBin;
-    console.log(integerValue, integerBitsHex, integerBitsBin);
-
-    for (let i = 0; i < tot; ++i) setNthBox(i, integerBitsBin[i]);
+    setBoxes(nowText);
     updateThreeParts();
   };
 
@@ -115,6 +118,40 @@ export default function Home() {
     .map((value, index) =>
       renderBox(value, signLen + expLen + index, "fraction"),
     );
+
+  // for recovering from history...
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      setFinalAns(history);
+      setBoxes(history);
+      updateThreeParts();
+    }
+  }, [setFinalAns]);
+
+  // for updating history per 1000ms...
+  useEffect(() => {
+    const toolName = "ieee754";
+    const loopTime = 1000;
+    const updateHistory = () => {
+      let now: string = finalAns;
+      // console.log("checking..." + now);
+      let rawInfo = localStorage.getItem(toolName);
+      if (rawInfo == null) {
+        localStorage.setItem(toolName, JSON.stringify(new Array(now)));
+      } else {
+        let parsedInfo = JSON.parse(rawInfo);
+        let last = parsedInfo[parsedInfo.length - 1];
+        if (now != last) {
+          parsedInfo.push(now);
+          localStorage.setItem(toolName, JSON.stringify(parsedInfo));
+        }
+      }
+    };
+    const intervalId = setInterval(updateHistory, loopTime);
+    return () => clearInterval(intervalId);
+  }, [finalAns]);
 
   return (
     <div style={{ padding: 20 }}>
