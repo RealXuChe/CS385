@@ -135,17 +135,47 @@ export default function Home() {
     const toolName = "ieee754";
     const loopTime = 1000;
     const updateHistory = () => {
+      const formatDate = (date: Date) => {
+        return (
+          date.getFullYear() +
+          "-" +
+          ("0" + (date.getMonth() + 1)).slice(-2) +
+          "-" +
+          ("0" + date.getDate()).slice(-2) +
+          " " +
+          ("0" + date.getHours()).slice(-2) +
+          ":" +
+          ("0" + date.getMinutes()).slice(-2) +
+          ":" +
+          ("0" + date.getSeconds()).slice(-2)
+        );
+      };
       let now: string = finalAns;
       // console.log("checking..." + now);
       let rawInfo = localStorage.getItem(toolName);
       if (rawInfo == null) {
-        localStorage.setItem(toolName, JSON.stringify(new Array(now)));
+        let newInfo = {
+          query: [now],
+          time: [formatDate(new Date())],
+        };
+        localStorage.setItem(toolName, JSON.stringify(newInfo));
       } else {
         let parsedInfo = JSON.parse(rawInfo);
-        let last = parsedInfo[parsedInfo.length - 1];
+        let queries = parsedInfo["query"];
+        let times = parsedInfo["time"];
+        let last = queries[queries.length - 1];
+        let nowQuery = now;
+        let nowTime = formatDate(new Date());
+        console.log("now, last = " + now + " " + last);
         if (now != last) {
-          parsedInfo.push(now);
-          localStorage.setItem(toolName, JSON.stringify(parsedInfo));
+          queries.push(nowQuery);
+          times.push(nowTime);
+          let newInfo = {
+            query: queries,
+            time: times,
+          };
+          let newInfoStr = JSON.stringify(newInfo);
+          localStorage.setItem(toolName, newInfoStr);
         }
       }
     };
