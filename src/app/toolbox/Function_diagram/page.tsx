@@ -26,7 +26,8 @@ const Home: React.FC = () => {
     );
   };
 
-  const [historySaved, setHistorySaved] = useState(false);
+  const [history, setHistory] = useState<string[]>([]);
+  const [isZooming, setIsZooming] = useState(false);
 
   const plotFunction = (xRange: [number, number]) => {
     try {
@@ -59,10 +60,14 @@ const Home: React.FC = () => {
 
       setData(plotData);
 
-      if (expression.trim() !== "" && !historySaved) {
-        saveHistory(expression);
-        setHistorySaved(true);
+      if (expression.trim() !== "" && !isZooming) {
+        if (!history.includes(expression)) {
+          setHistory((prevHistory) => [...prevHistory, expression]);
+          saveHistory(expression);
+        }
       }
+
+      setIsZooming(false);
     } catch (error) {
       console.error("Invalid expression:", error);
       setData([]);
@@ -70,12 +75,14 @@ const Home: React.FC = () => {
   };
 
   const handleRelayout = (eventData: any) => {
-    setHistorySaved(true);
-
     const xRange: [number, number] = [
       eventData["xaxis.range[0]"],
       eventData["xaxis.range[1]"],
     ];
+
+    if (xRange[0] !== -10 || xRange[1] !== 10) {
+      setIsZooming(true);
+    }
 
     plotFunction(xRange);
   };
@@ -106,17 +113,50 @@ const Home: React.FC = () => {
     }
   };
 
+  const loadHistoryImage = (expression: string) => {
+    try {
+      const xValues = [];
+      const yValues = [];
+
+      const processedExpression = expression
+        .replace(/\bsin\b/g, "Math.sin")
+        .replace(/\bcos\b/g, "Math.cos")
+        .replace(/\btan\b/g, "Math.tan")
+        .replace(/\blog\b/g, "Math.log")
+        .replace(/\bexp\b/g, "Math.exp")
+        .replace(/\^/g, "**");
+
+      const func = new Function("x", `return ${processedExpression}`);
+
+      for (let x = -10; x <= 10; x += 0.1) {
+        xValues.push(x);
+        yValues.push(func(x));
+      }
+
+      const plotData = [
+        {
+          type: "scatter",
+          mode: "lines",
+          x: xValues,
+          y: yValues,
+        },
+      ];
+
+      setData(plotData);
+    } catch (error) {
+      console.error("Invalid expression:", error);
+      setData([]);
+    }
+  };
+
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const history = queryParams.get("history");
     if (history != null) {
       setExpression(history);
+      loadHistoryImage(history);
     }
   }, []);
-
-  useEffect(() => {
-    plotFunction([-10, 10]);
-  }, [expression]);
 
   return (
     <Container
