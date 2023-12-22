@@ -2,7 +2,9 @@
 import { TextField, Box, Button, Grid, Paper, Typography } from "@mui/material";
 import { Snackbar, Alert } from "@mui/material";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const toolName = "bintree";
 
 class Pair<T1, T2> {
   constructor(
@@ -88,6 +90,7 @@ export default function Home() {
     newDot += dotTail;
     // console.log(newDot);
     setDot(newDot);
+    updateHistory(newDot);
   };
 
   const [openAlert, setOpenAlert] = useState(false);
@@ -295,6 +298,58 @@ export default function Home() {
 
     drawGraph();
   };
+
+  const updateHistory = (now: string) => {
+    const formatDate = (date: Date) => {
+      return (
+        date.getFullYear() +
+        "-" +
+        ("0" + (date.getMonth() + 1)).slice(-2) +
+        "-" +
+        ("0" + date.getDate()).slice(-2) +
+        " " +
+        ("0" + date.getHours()).slice(-2) +
+        ":" +
+        ("0" + date.getMinutes()).slice(-2) +
+        ":" +
+        ("0" + date.getSeconds()).slice(-2)
+      );
+    };
+    // console.log("checking..." + now);
+    let rawInfo = localStorage.getItem(toolName);
+    if (rawInfo == null) {
+      let newInfo = {
+        query: [now],
+        time: [formatDate(new Date())],
+      };
+      localStorage.setItem(toolName, JSON.stringify(newInfo));
+    } else {
+      let parsedInfo = JSON.parse(rawInfo);
+      let queries = parsedInfo["query"];
+      let times = parsedInfo["time"];
+      let last = queries[queries.length - 1];
+      let nowQuery = now;
+      let nowTime = formatDate(new Date());
+      if (now != last) {
+        queries.push(nowQuery);
+        times.push(nowTime);
+        let newInfo = {
+          query: queries,
+          time: times,
+        };
+        let newInfoStr = JSON.stringify(newInfo);
+        localStorage.setItem(toolName, newInfoStr);
+      }
+    }
+  };
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      console.log(history);
+      setDot(history);
+    }
+  }, [setDot]);
 
   return (
     <Box display="flex" flexDirection="column" minHeight="100vh" padding={2}>
