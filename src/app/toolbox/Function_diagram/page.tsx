@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Plot from "react-plotly.js";
 import { Button, TextField, Container, Paper } from "@mui/material";
 
@@ -7,6 +7,24 @@ const Home: React.FC = () => {
   const [expression, setExpression] = useState<string>("");
   const [data, setData] = useState<any[]>([]);
   const graphRef = useRef<any>(null);
+
+  const toolName = "Function_diagram";
+
+  const formatDate = (date: Date) => {
+    return (
+      date.getFullYear() +
+      "-" +
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2) +
+      " " +
+      ("0" + date.getHours()).slice(-2) +
+      ":" +
+      ("0" + date.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + date.getSeconds()).slice(-2)
+    );
+  };
 
   const plotFunction = (xRange: [number, number]) => {
     try {
@@ -38,6 +56,10 @@ const Home: React.FC = () => {
       ];
 
       setData(plotData);
+
+      if (expression.trim() !== "") {
+        saveHistory(expression);
+      }
     } catch (error) {
       console.error("Invalid expression:", error);
       setData([]);
@@ -52,6 +74,41 @@ const Home: React.FC = () => {
 
     plotFunction(xRange);
   };
+
+  const saveHistory = (text: string) => {
+    let rawInfo = localStorage.getItem(toolName);
+    if (rawInfo == null) {
+      let newInfo = {
+        query: [text],
+        time: [formatDate(new Date())],
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    } else {
+      let parsedInfo = JSON.parse(rawInfo);
+      let queries = parsedInfo["query"];
+      let times = parsedInfo["time"];
+      let nowQuery = text;
+      let nowTime = formatDate(new Date());
+      queries.push(nowQuery);
+      times.push(nowTime);
+      let newInfo = {
+        query: queries,
+        time: times,
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    }
+  };
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      setExpression(history);
+      plotFunction([-10, 10]);
+    }
+  }, []);
 
   return (
     <Container

@@ -4,7 +4,8 @@ const cwb: ToolMeta = {
   name: "Function diagram",
   route: "/toolbox/Function_diagram",
   icon: "icon-function.svg",
-  introduction: "This is an introduction",
+  introduction:
+    "A concise tool for graphing images based on user-input mathematical functions.",
 };
 
 export default cwb;
