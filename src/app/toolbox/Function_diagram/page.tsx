@@ -1,12 +1,12 @@
 "use client";
-import React, { useState, useRef } from "react";
-import Plot from "react-plotly.js";
+import React, { useState } from "react";
+import dynamic from "next/dynamic";
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 import { Button, TextField, Container, Paper } from "@mui/material";
 
 const Home: React.FC = () => {
   const [expression, setExpression] = useState<string>("");
   const [data, setData] = useState<any[]>([]);
-  const graphRef = useRef<any>(null);
 
   const plotFunction = (xRange: [number, number]) => {
     try {
@@ -93,7 +93,6 @@ const Home: React.FC = () => {
       </Paper>
 
       <Plot
-        ref={graphRef}
         data={data}
         layout={{
           width: 800,
