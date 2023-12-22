@@ -128,7 +128,7 @@ export default function Home() {
       setBoxes(history);
       updateThreeParts();
     }
-  }, [setFinalAns]);
+  }, [setFinalAns, setBoxes, updateThreeParts]);
 
   // for updating history per 1000ms...
   useEffect(() => {
