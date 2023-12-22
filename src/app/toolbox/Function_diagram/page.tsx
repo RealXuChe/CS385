@@ -26,6 +26,8 @@ const Home: React.FC = () => {
     );
   };
 
+  const [historySaved, setHistorySaved] = useState(false);
+
   const plotFunction = (xRange: [number, number]) => {
     try {
       const xValues = [];
@@ -57,8 +59,9 @@ const Home: React.FC = () => {
 
       setData(plotData);
 
-      if (expression.trim() !== "") {
+      if (expression.trim() !== "" && !historySaved) {
         saveHistory(expression);
+        setHistorySaved(true);
       }
     } catch (error) {
       console.error("Invalid expression:", error);
@@ -67,6 +70,8 @@ const Home: React.FC = () => {
   };
 
   const handleRelayout = (eventData: any) => {
+    setHistorySaved(true);
+
     const xRange: [number, number] = [
       eventData["xaxis.range[0]"],
       eventData["xaxis.range[1]"],
@@ -106,9 +111,12 @@ const Home: React.FC = () => {
     const history = queryParams.get("history");
     if (history != null) {
       setExpression(history);
-      plotFunction([-10, 10]);
     }
   }, []);
+
+  useEffect(() => {
+    plotFunction([-10, 10]);
+  }, [expression]);
 
   return (
     <Container
