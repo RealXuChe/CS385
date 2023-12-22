@@ -1,4 +1,9 @@
+"use client";
 import Link from "next/link";
+
+const jump = (to: string) => {
+  window.location.href = to;
+};
 
 export default function Navbar() {
   return (
@@ -10,6 +15,7 @@ export default function Navbar() {
         <Link
           className="text-white hover:text-blue-200 dark:hover:text-blue-400 cursor-pointer select-none text-2xl"
           href="/"
+          onClick={() => jump("/")}
         >
           Cepheus Toolkit
         </Link>
@@ -20,6 +26,7 @@ export default function Navbar() {
             <Link
               className="text-white hover:text-blue-200 dark:hover:text-blue-400 cursor-pointer select-none text-2xl"
               href="/Signin"
+              onClick={() => jump("/Signin")}
             >
               Sign In
             </Link>

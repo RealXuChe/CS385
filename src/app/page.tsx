@@ -1,6 +1,7 @@
 import exported_tools from "./toolbox/module";
 import { ToolMeta } from "@/inlcude/tool_metadata";
 import Link from "next/link";
+import Image from "next/image";
 
 function ToolCardBg({ meta }: { meta: ToolMeta }) {
   return (
@@ -22,11 +23,18 @@ function ToolCardBg({ meta }: { meta: ToolMeta }) {
         >
           <div className="">
             <div className="2xl:w-[11.625rem] 2xl:h-[11.625rem] xl:w-[11.625rem] xl:h-[11.625rem] lg:w-[11.625rem] lg:h-[11.625rem] md:w-[11.625rem] md:h-[11.625rem] sm:w-[11.625rem] sm:h-[11.625rem] w-[8rem] h-[8rem] float-left">
-              <img
+              {/*<img*/}
+              {/*  src={meta.icon}*/}
+              {/*  alt="icon"*/}
+              {/*  className="p-6 drop-shadow-[0rem_0.125rem_0.625rem_rgba(1,6,97,0.25)]"*/}
+              {/*/>*/}
+              <Image
                 src={meta.icon}
-                alt="icon"
+                alt={"icon"}
+                width={186}
+                height={186}
                 className="p-6 drop-shadow-[0rem_0.125rem_0.625rem_rgba(1,6,97,0.25)]"
-              />
+              ></Image>
             </div>
             <div className=" 2xl:w-[18rem] xl:w-[18rem] lg:w-[18rem] md:w-[18rem] sm:w-[18rem] w-[10rem] float-left">
               <p
@@ -55,7 +63,8 @@ export default function Home() {
     <div className="rounded-2xl my-7 bg-[#F4F2F4] shadow-[inset_0rem_0.25rem_0.5rem_rgba(0,0,0,0.25)]">
       {/* title&icon */}
       <div className="flex justify-center py-16">
-        <img src="title.svg" alt="title" />
+        {/*<img src="title.svg" alt="title" />*/}
+        <Image src="title.svg" alt={"title"} width={677} height={72}></Image>
       </div>
       {/* search input */}
       <div className="mx-0 flex justify-center">
