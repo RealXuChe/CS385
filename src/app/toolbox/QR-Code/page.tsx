@@ -1,17 +1,73 @@
 "use client";
 import { Button, TextField } from "@mui/material";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import QRCode from "qrcode.react";
 import Image from "next/image";
 
 export default function Home() {
-  function qrCodeGenerate() {
-    setInputText(text);
-  }
+  const toolName = "QR-Code";
   const [text, setText] = useState("");
   const [inputText, setInputText] = useState("");
   const [showQRCode, setShowQRCode] = useState(false);
   const qrCodeRef = useRef(null);
+
+  const formatDate = (date: Date) => {
+    return (
+      date.getFullYear() +
+      "-" +
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2) +
+      " " +
+      ("0" + date.getHours()).slice(-2) +
+      ":" +
+      ("0" + date.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + date.getSeconds()).slice(-2)
+    );
+  };
+  const saveHistory = (text: string) => {
+    let rawInfo = localStorage.getItem(toolName);
+    if (rawInfo == null) {
+      let newInfo = {
+        query: [text],
+        time: [formatDate(new Date())],
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    } else {
+      let parsedInfo = JSON.parse(rawInfo);
+      let queries = parsedInfo["query"];
+      let times = parsedInfo["time"];
+      let nowQuery = text;
+      let nowTime = formatDate(new Date());
+      queries.push(nowQuery);
+      times.push(nowTime);
+      let newInfo = {
+        query: queries,
+        time: times,
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    }
+  };
+
+  const qrCodeGenerate = (onJump: boolean = false) => {
+    setInputText(text);
+    if (!onJump) saveHistory(text);
+  };
+
+  // when jumping from the history list
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      setText(history);
+      setShowQRCode(true);
+      qrCodeGenerate(true);
+    }
+  }, []);
+
   return (
     <div className={"column"}>
       <div className="flex justify-center p-8">
