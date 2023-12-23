@@ -90,7 +90,7 @@ export default function Home() {
     newDot += dotTail;
     // console.log(newDot);
     setDot(newDot);
-    updateHistory(newDot);
+    updateHistory(edges, nodes);
   };
 
   const [openAlert, setOpenAlert] = useState(false);
@@ -299,7 +299,10 @@ export default function Home() {
     drawGraph();
   };
 
-  const updateHistory = (now: string) => {
+  const updateHistory = (
+    edges: PairSet<string, string>,
+    nodes: Set<string>,
+  ) => {
     const formatDate = (date: Date) => {
       return (
         date.getFullYear() +
@@ -315,7 +318,19 @@ export default function Home() {
         ("0" + date.getSeconds()).slice(-2)
       );
     };
-    // console.log("checking..." + now);
+
+    let now = "";
+    edges.forEach((e) => {
+      now += e.first + "-" + e.second + ",";
+    });
+    now = now.substring(0, now.length - 1);
+    now += "|||";
+    nodes.forEach((node) => {
+      now += node + ",";
+    });
+    now = now.substring(0, now.length - 1);
+    console.log(now);
+
     let rawInfo = localStorage.getItem(toolName);
     if (rawInfo == null) {
       let newInfo = {
@@ -346,8 +361,43 @@ export default function Home() {
     const queryParams = new URLSearchParams(window.location.search);
     const history = queryParams.get("history");
     if (history != null) {
-      console.log(history);
-      setDot(history);
+      let edgesRaw = history.split("|||")[0];
+      let edgesRaw2 = edgesRaw.length > 0 ? edgesRaw.split(",") : [];
+      let edges = new PairSet<string, string>();
+      for (const edge of edgesRaw2) {
+        let u = edge.split("-")[0];
+        let v = edge.split("-")[1];
+        edges.add(new Pair(u, v));
+      }
+      let nodesRaw = history.split("|||")[1];
+      let nodes = nodesRaw.split(",");
+      let newDot = dotHead;
+      const addEdge = (u: string, v: string) => {
+        newDot += u + "--" + v + "; ";
+      };
+      const addNode = (u: string) => {
+        newDot += u + "[" + "shape=circle" + "]" + "; ";
+      };
+      edges.forEach((e) => {
+        if (e.first == root) addEdge(e.first, e.second);
+      });
+      edges.forEach((e) => {
+        if (e.first != root) addEdge(e.first, e.second);
+      });
+      nodes.forEach((node) => {
+        addNode(node);
+      });
+      nodes.forEach((node) => {
+        if (node == root && deg.get(node)! == 1)
+          addEdge(node, 'nullnode[style="invis"]');
+        if (node != root && deg.get(node)! == 1)
+          addEdge(node, 'nullnode[style="invis"]'),
+            addEdge(node, 'nullnode[style="invis"]');
+        if (node != root && deg.get(node)! == 2)
+          addEdge(node, 'nullnode[style="invis"]');
+      });
+      newDot += dotTail;
+      setDot(newDot);
     }
   }, [setDot]);
 
