@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 import { Button, TextField, Container, Paper } from "@mui/material";
@@ -7,6 +7,27 @@ import { Button, TextField, Container, Paper } from "@mui/material";
 const Home: React.FC = () => {
   const [expression, setExpression] = useState<string>("");
   const [data, setData] = useState<any[]>([]);
+
+  const toolName = "Function_diagram";
+
+  const formatDate = (date: Date) => {
+    return (
+      date.getFullYear() +
+      "-" +
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2) +
+      " " +
+      ("0" + date.getHours()).slice(-2) +
+      ":" +
+      ("0" + date.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + date.getSeconds()).slice(-2)
+    );
+  };
+
+  const [history, setHistory] = useState<string[]>([]);
+  const [isZooming, setIsZooming] = useState(false);
 
   const plotFunction = (xRange: [number, number]) => {
     try {
@@ -38,6 +59,15 @@ const Home: React.FC = () => {
       ];
 
       setData(plotData);
+
+      if (expression.trim() !== "" && !isZooming) {
+        if (!history.includes(expression)) {
+          setHistory((prevHistory) => [...prevHistory, expression]);
+          saveHistory(expression);
+        }
+      }
+
+      setIsZooming(false);
     } catch (error) {
       console.error("Invalid expression:", error);
       setData([]);
@@ -50,8 +80,83 @@ const Home: React.FC = () => {
       eventData["xaxis.range[1]"],
     ];
 
+    if (xRange[0] !== -10 || xRange[1] !== 10) {
+      setIsZooming(true);
+    }
+
     plotFunction(xRange);
   };
+
+  const saveHistory = (text: string) => {
+    let rawInfo = localStorage.getItem(toolName);
+    if (rawInfo == null) {
+      let newInfo = {
+        query: [text],
+        time: [formatDate(new Date())],
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    } else {
+      let parsedInfo = JSON.parse(rawInfo);
+      let queries = parsedInfo["query"];
+      let times = parsedInfo["time"];
+      let nowQuery = text;
+      let nowTime = formatDate(new Date());
+      queries.push(nowQuery);
+      times.push(nowTime);
+      let newInfo = {
+        query: queries,
+        time: times,
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    }
+  };
+
+  const loadHistoryImage = (expression: string) => {
+    try {
+      const xValues = [];
+      const yValues = [];
+
+      const processedExpression = expression
+        .replace(/\bsin\b/g, "Math.sin")
+        .replace(/\bcos\b/g, "Math.cos")
+        .replace(/\btan\b/g, "Math.tan")
+        .replace(/\blog\b/g, "Math.log")
+        .replace(/\bexp\b/g, "Math.exp")
+        .replace(/\^/g, "**");
+
+      const func = new Function("x", `return ${processedExpression}`);
+
+      for (let x = -10; x <= 10; x += 0.1) {
+        xValues.push(x);
+        yValues.push(func(x));
+      }
+
+      const plotData = [
+        {
+          type: "scatter",
+          mode: "lines",
+          x: xValues,
+          y: yValues,
+        },
+      ];
+
+      setData(plotData);
+    } catch (error) {
+      console.error("Invalid expression:", error);
+      setData([]);
+    }
+  };
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      setExpression(history);
+      loadHistoryImage(history);
+    }
+  }, []);
 
   return (
     <Container
