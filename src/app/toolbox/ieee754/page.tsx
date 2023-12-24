@@ -151,6 +151,7 @@ export default function Home() {
         );
       };
       let now: string = finalAns;
+      if (now == "0") return;
       // console.log("checking..." + now);
       let rawInfo = localStorage.getItem(toolName);
       if (rawInfo == null) {
@@ -166,7 +167,7 @@ export default function Home() {
         let last = queries[queries.length - 1];
         let nowQuery = now;
         let nowTime = formatDate(new Date());
-        console.log("now, last = " + now + " " + last);
+        // console.log("now, last = " + now + " " + last);
         if (now != last) {
           queries.push(nowQuery);
           times.push(nowTime);
