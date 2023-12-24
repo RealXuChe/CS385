@@ -3,7 +3,10 @@ import exported_tools from "./toolbox/module";
 import { ToolMeta } from "@/inlcude/tool_metadata";
 import Link from "next/link";
 import Image from "next/image";
-import meta from "@/app/toolbox/cidr-calculator/metadata";
+
+const jump = (to: string) => {
+  window.location.href = to;
+};
 
 function ToolCardBg({ meta }: { meta: ToolMeta }) {
   return (
@@ -16,6 +19,7 @@ function ToolCardBg({ meta }: { meta: ToolMeta }) {
       <Link
         href={meta.route}
         className="relative 2xl:bottom-[11.25rem] 2xl:right-[1rem] xl:bottom-[11.25rem] xl:right-[1rem] sm:bottom-[7.5rem] sm:right-[0.5rem] bottom-[5.75rem] right-[0.25rem]"
+        onClick={() => jump(meta.route)}
       >
         <div
           className="2xl:h-[12rem] 2xl:w-[31rem] xl:h-[12rem] xl:w-[31rem] sm:h-[8rem] sm:w-[8rem] h-[6rem] w-[6rem]
@@ -105,6 +109,14 @@ function HistoryCard() {
             "?history=" +
             historyItems[index]["query"]
           }
+          onClick={() =>
+            jump(
+              "/toolbox/" +
+                historyItems[index]["tool"] +
+                "?history=" +
+                historyItems[index]["query"],
+            )
+          }
         >
           <div
             className="flex bg-[#9C95F0] rounded-xl ease-in-out shadow-md duration-300 hover:bg-[#756AF3] hover:scale-105
@@ -169,14 +181,14 @@ export default function Home() {
           </div>
           {/*Dashboard-History*/}
           <div
-            className="flex flex-col flex-auto bg-[#E0CAF7] overflow-y-auto overflow-hidden rounded-3xl shadow-lg
-                    2xl:w-1/3 sm:w-1/3 desktop:max-h-[53.25rem] xl:max-h-[106.5rem] sm:max-h-[62rem] max-h-[43.25rem] 2xl:ml-24 xl:ml-8 sm:ml-4 ml-4 w-1/3"
+            className="flex flex-col flex-auto bg-[#E0CAF7] rounded-3xl shadow-lg overflow-y-auto
+            2xl:w-1/3 sm:w-1/3 desktop:max-h-[53.25rem] xl:max-h-[106.5rem] sm:max-h-[62rem] max-h-[43.25rem] 2xl:ml-24 xl:ml-8 sm:ml-4 ml-4 w-1/3
+            scrollbar-thin scrollbar-thumb-[#F2EAF8]/60 scrollbar-track-[#E6D8F3] scrollbar-track-rounded-full hover:scrollbar-thumb-[#D3B8EF]/80 scrollbar-thumb-rounded-full scroll-smooth
+"
           >
             {/*History frame*/}
-            <div
-              className="flex-auto rounded-3xl
-                        md:mx-8 sm:mx-4 md:mt-8 sm:mt-4 md:mb-5 sm:mb-1 mx-4 mt-4 mb-1"
-            >
+            <div className="md:mx-8 sm:mx-4 md:mt-8 sm:mt-4 md:mb-5 sm:mb-1 mx-4 mt-4 mb-1">
+              <div className=""></div>
               <HistoryCard></HistoryCard>
             </div>
           </div>
