@@ -9,7 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-import { InputAdornment } from "@mui/material";
+import { InputAdornment, Typography } from "@mui/material";
 import React, { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -198,6 +198,12 @@ export default function Signup() {
             </FormControl>
           </ThemeProvider>
         </div>
+
+        {errorStat !== null && (
+          <Typography className="ml-[2.56rem]" color="error" variant="caption">
+            {errorStat}
+          </Typography>
+        )}
 
         <div className="flex justify-center mt-[2rem] ">
           <ThemeProvider theme={buttonTheme}>
