@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="77"
+   height="69"
+   viewBox="0 0 77 69"
+   fill="none"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="favicon.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   inkscape:export-filename="favicon.png"
+   inkscape:export-xdpi="59.84"
+   inkscape:export-ydpi="59.84"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:export-bgcolor="#ffffff00"
+     inkscape:zoom="26.478261"
+     inkscape:cx="38.484401"
+     inkscape:cy="34.5"
+     inkscape:window-width="3840"
+     inkscape:window-height="2108"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <path
+     fill-rule="evenodd"
+     clip-rule="evenodd"
+     d="M76 58.844C76 62.2351 73.318 65.0265 69.9117 65.1805L7.68883 67.9933C4.05648 68.1575 1.02131 65.2731 1.02131 61.6569V31.4439L1.00001 31.4438L1.00655 28.3372C1.00685 28.1939 1.01183 28.0519 1.02131 27.9115V18.1789C0.807241 15.5254 2.20508 12.7492 5.24508 11.6763L34.4629 1.36532C36.6845 0.581332 39.1597 1.07991 40.8994 2.66181L73.8873 32.6571C75.4982 34.1219 76.1091 35.9545 75.9824 37.7037C75.994 37.7725 76 37.8431 76 37.9151V58.844ZM39.178 4.53434C38.1341 3.5852 36.649 3.28605 35.3161 3.75644L6.09823 14.0675C4.25343 14.7185 3.41653 16.415 3.56874 18.0234H3.57248V18.061C3.71755 19.4518 4.60334 20.7699 6.21767 21.2808L6.23307 21.2857L17.9753 25.1651L68.4198 40.9639L68.4234 40.9651C72.3331 42.2023 75.1939 37.283 72.1658 34.5296L39.178 4.53434ZM17.1805 27.5762L17.1751 27.5742L8.59063 24.7387C6.22356 23.9568 3.78371 25.5968 3.57248 28.0108V61.6569C3.57248 63.8266 5.39358 65.5573 7.57299 65.4587L69.7959 62.6459C71.8396 62.5535 73.4488 60.8787 73.4488 58.844V48.0036C73.4488 46.3432 72.3665 44.8745 70.7745 44.3744L17.1805 27.5762Z"
+     fill="black"
+     stroke="black"
+     stroke-width="2"
+     id="path1" />
+</svg>
