@@ -73,7 +73,10 @@ export default function Home() {
       if (e.first == root) addEdge(e.first, e.second);
     });
     edges.forEach((e) => {
-      if (e.first != root) addEdge(e.first, e.second);
+      if (e.second == root) addEdge(e.second, e.first);
+    });
+    edges.forEach((e) => {
+      if (e.first != root && e.second != root) addEdge(e.first, e.second);
     });
     nodes.forEach((node) => {
       addNode(node);
@@ -88,6 +91,7 @@ export default function Home() {
         addEdge(node, 'nullnode[style="invis"]');
     });
     newDot += dotTail;
+    console.log("now root node = " + root);
     // console.log(newDot);
     setDot(newDot);
     updateHistory(edges, nodes);
@@ -329,6 +333,8 @@ export default function Home() {
       now += node + ",";
     });
     now = now.substring(0, now.length - 1);
+    now += "|||";
+    now += root;
     console.log(now);
 
     let rawInfo = localStorage.getItem(toolName);
@@ -371,6 +377,7 @@ export default function Home() {
       }
       let nodesRaw = history.split("|||")[1];
       let nodes = nodesRaw.split(",");
+      let root = history.split("|||")[2];
       let newDot = dotHead;
       const addEdge = (u: string, v: string) => {
         newDot += u + "--" + v + "; ";
@@ -382,7 +389,10 @@ export default function Home() {
         if (e.first == root) addEdge(e.first, e.second);
       });
       edges.forEach((e) => {
-        if (e.first != root) addEdge(e.first, e.second);
+        if (e.second == root) addEdge(e.second, e.first);
+      });
+      edges.forEach((e) => {
+        if (e.first != root && e.second != root) addEdge(e.first, e.second);
       });
       nodes.forEach((node) => {
         addNode(node);
@@ -397,6 +407,7 @@ export default function Home() {
           addEdge(node, 'nullnode[style="invis"]');
       });
       newDot += dotTail;
+      // console.log(newDot);
       setDot(newDot);
     }
   }, [setDot]);
