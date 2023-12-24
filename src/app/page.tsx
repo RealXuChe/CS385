@@ -3,6 +3,7 @@ import exported_tools from "./toolbox/module";
 import { ToolMeta } from "@/inlcude/tool_metadata";
 import Link from "next/link";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
 
 const jump = (to: string) => {
   window.location.href = to;
@@ -65,48 +66,56 @@ function getLastFolderName(meta: ToolMeta) {
   return segments[segments.length - 1];
 }
 const HistoryCard = () => {
-  if (typeof window === "undefined") return <div></div>;
-  let names: string[] = [];
-  {
-    exported_tools.map((list, idx) => {
-      names.push(getLastFolderName(list));
-    });
+  interface HistoryItem {
+    tool: string;
+    fullName: string;
+    query: string;
+    time: string;
+    dateObj: Date;
   }
-  let dict: { [index: string]: string } = {
-    "cidr-calculator": "CIDR Calculator",
-    ieee754: "Floating Point Number Viewer",
-    bintree: "Binary Tree Viewer",
-    Function_diagram: "Function diagram",
-    "QR-Code": "QR Code",
-    "unit-conversion": "Unit Conversion",
-  };
-  let historyItems = new Array();
-  for (const name of names) {
-    let rawInfo = localStorage.getItem(name);
-    if (rawInfo != null) {
-      let parsedInfo = JSON.parse(rawInfo);
-      let queries = parsedInfo["query"];
-      let times = parsedInfo["time"];
-      for (let i = 0; i < queries.length; ++i) {
-        if (queries[i] == "") continue;
-        historyItems.push({
-          tool: name,
-          fullName: dict[name],
-          query: queries[i],
-          time: times[i],
-          dateObj: new Date(
-            times[i].replace(
-              /^(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)$/,
-              "$4:$5:$6 $2/$3/$1",
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  useEffect(() => {
+    // Make sure the `localStorage` be accessed in the browser, not server.
+    let names = exported_tools.map((list) => getLastFolderName(list));
+    let dict: { [index: string]: string } = {
+      "cidr-calculator": "CIDR Calculator",
+      ieee754: "Floating Point Number Viewer",
+      bintree: "Binary Tree Viewer",
+      Function_diagram: "Function diagram",
+      "QR-Code": "QR Code",
+      "unit-conversion": "Unit Conversion",
+    };
+
+    let items = [];
+    for (const name of names) {
+      let rawInfo = localStorage.getItem(name);
+      if (rawInfo != null) {
+        let parsedInfo = JSON.parse(rawInfo);
+        let queries = parsedInfo["query"];
+        let times = parsedInfo["time"];
+        for (let i = 0; i < queries.length; ++i) {
+          if (queries[i] === "") continue;
+          items.push({
+            tool: name,
+            fullName: dict[name],
+            query: queries[i],
+            time: times[i],
+            dateObj: new Date(
+              times[i].replace(
+                /^(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)$/,
+                "$4:$5:$6 $2/$3/$1",
+              ),
             ),
-          ),
-        });
+          });
+        }
       }
     }
-  }
-  historyItems.sort(function (first, second) {
-    return second.dateObj - first.dateObj;
-  });
+
+    items.sort(
+      (first, second) => Number(second.dateObj) - Number(first.dateObj),
+    );
+    setHistoryItems(items);
+  }, []);
 
   return (
     <div>
