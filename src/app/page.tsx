@@ -10,31 +10,31 @@ const jump = (to: string) => {
 
 function ToolCardBg({ meta }: { meta: ToolMeta }) {
   return (
-    <div className="2xl:mb-16 xl:mb-16 sm:mb-1 mb-1 2xl:h-[12.75rem] xl:h-[12.75rem] sm:h-[9.75rem] h-[6.75rem] mx-auto">
+    <div className="2xl:mb-16 xl:mb-16 sm:mb-1 mb-1 2xl:h-[12.75rem] xl:h-[12.75rem] sm:h-[9.75rem] h-[4.75rem] mx-auto">
       <div
-        className="2xl:h-[12rem] 2xl:w-[31rem] xl:h-[12rem] xl:w-[31rem] sm:h-[8rem] sm:w-[8rem] h-[6rem] w-[6rem]
+        className="2xl:h-[12rem] 2xl:w-[31rem] xl:h-[12rem] xl:w-[31rem] sm:h-[8rem] sm:w-[8rem] h-[4rem] w-[4rem]
                    bg-gradient-to-b from-[#6366F1]/[0.8] to-[#7073FF]/[0.3] rounded-2xl overflow-hidden"
       ></div>
 
       <Link
         href={meta.route}
-        className="relative 2xl:bottom-[11.25rem] 2xl:right-[1rem] xl:bottom-[11.25rem] xl:right-[1rem] sm:bottom-[7.5rem] sm:right-[0.5rem] bottom-[5.75rem] right-[0.25rem]"
+        className="relative 2xl:bottom-[11.25rem] 2xl:right-[1rem] xl:bottom-[11.25rem] xl:right-[1rem] sm:bottom-[7.5rem] sm:right-[0.5rem] bottom-[3.75rem] right-[0.25rem]"
         onClick={() => jump(meta.route)}
       >
         <div
-          className="2xl:h-[12rem] 2xl:w-[31rem] xl:h-[12rem] xl:w-[31rem] sm:h-[8rem] sm:w-[8rem] h-[6rem] w-[6rem]
+          className="2xl:h-[12rem] 2xl:w-[31rem] xl:h-[12rem] xl:w-[31rem] sm:h-[8rem] sm:w-[8rem] h-[4rem] w-[4rem]
                     backdrop-filter backdrop-blur-md bg-[#EBEBEB]/30 rounded-2xl
                     shadow-[0.25rem_0.25rem_0.5rem_rgba(0,0,0,0.25)] border-4 border-[#EBEBEB]/50
                     ease-in-out duration-300 hover:scale-105" /*bg op 10-20; border stroke 4-6px; border op-30*/
         >
           <div className="">
-            <div className="2xl:w-[11.625rem] 2xl:h-[11.625rem] xl:w-[11.625rem] xl:h-[11.625rem] sm:w-[8rem] sm:h-[8rem] w-[8rem] h-[8rem] float-left">
+            <div className="2xl:w-[11.625rem] 2xl:h-[11.625rem] xl:w-[11.625rem] xl:h-[11.625rem] sm:w-[8rem] sm:h-[8rem] w-[4rem] h-[4rem] float-left">
               <Image
                 src={meta.icon}
                 alt={"icon"}
                 width={186}
                 height={186}
-                className="sm:p-6 drop-shadow-[0rem_0.125rem_0.625rem_rgba(1,6,97,0.25)] xl:w-[11.625rem] xl:h-[11.625rem] sm:w-[7.5rem] sm:h-[7.5rem] w-[5.5rem] h-[5.5rem] p-3"
+                className="sm:p-6 drop-shadow-[0rem_0.125rem_0.625rem_rgba(1,6,97,0.25)] xl:w-[11.625rem] xl:h-[11.625rem] sm:w-[7.5rem] sm:h-[7.5rem] w-[3.5rem] h-[3.5rem] p-3"
               ></Image>
             </div>
             <div className=" 2xl:w-[18rem] xl:w-[18rem] lg:w-[18rem] md:w-[18rem] xl:block sm:hidden hidden float-left">
@@ -64,13 +64,22 @@ function getLastFolderName(meta: ToolMeta) {
   const segments = normalizedPath.split("/");
   return segments[segments.length - 1];
 }
-function HistoryCard() {
+const HistoryCard = () => {
+  if (typeof window === "undefined") return <div></div>;
   let names: string[] = [];
   {
     exported_tools.map((list, idx) => {
       names.push(getLastFolderName(list));
     });
   }
+  let dict: { [index: string]: string } = {
+    "cidr-calculator": "CIDR Calculator",
+    ieee754: "Floating Point Number Viewer",
+    bintree: "Binary Tree Viewer",
+    Function_diagram: "Function diagram",
+    "QR-Code": "QR Code",
+    "unit-conversion": "Unit Conversion",
+  };
   let historyItems = new Array();
   for (const name of names) {
     let rawInfo = localStorage.getItem(name);
@@ -82,6 +91,7 @@ function HistoryCard() {
         if (queries[i] == "") continue;
         historyItems.push({
           tool: name,
+          fullName: dict[name],
           query: queries[i],
           time: times[i],
           dateObj: new Date(
@@ -126,18 +136,20 @@ function HistoryCard() {
               className="m-auto truncate text-amber-50
                                 2xl:w-11/12 sm:w-11/12 2xl:h-5/6 sm:h-5/6 w-11/12 h-5/6"
             >
-              {historyItems[index]["tool"]}
-              <br />
-              {historyItems[index]["query"]}
-              <br />
-              {historyItems[index]["time"]}
+              <div className="text-xl font-bold truncate">
+                {historyItems[index]["fullName"]}
+              </div>
+              <div className="truncate">{historyItems[index]["query"]}</div>
+              <div className="text-[#EAEAEA]">
+                {historyItems[index]["time"]}
+              </div>
             </div>
           </div>
         </Link>
       ))}
     </div>
   );
-}
+};
 
 export default function Home() {
   return (
@@ -182,7 +194,7 @@ export default function Home() {
           {/*Dashboard-History*/}
           <div
             className="flex flex-col flex-auto bg-[#E0CAF7] rounded-3xl shadow-lg overflow-y-auto
-            2xl:w-1/3 sm:w-1/3 desktop:max-h-[53.25rem] xl:max-h-[106.5rem] sm:max-h-[62rem] max-h-[43.25rem] 2xl:ml-24 xl:ml-8 sm:ml-4 ml-4 w-1/3
+            2xl:w-1/3 sm:w-1/3 desktop:max-h-[66rem] xl:max-h-[129rem] sm:max-h-[81.5rem] max-h-[40.75rem] 2xl:ml-24 xl:ml-8 sm:ml-4 ml-4 w-1/3
             scrollbar-thin scrollbar-thumb-[#F2EAF8]/60 scrollbar-track-[#E6D8F3] scrollbar-track-rounded-full hover:scrollbar-thumb-[#D3B8EF]/80 scrollbar-thumb-rounded-full scroll-smooth
 "
           >
