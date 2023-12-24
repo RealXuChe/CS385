@@ -119,6 +119,7 @@ export default function Signin() {
         localStorage.setItem("token", result.data.token);
         localStorage.setItem("username", result.data.username);
         localStorage.setItem("avatar", result.data.avatar);
+        route.refresh();
         route.push("/");
       })
       .catch((error) => console.log("error", error));
