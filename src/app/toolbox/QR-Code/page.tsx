@@ -73,7 +73,7 @@ export default function Home() {
     if (history != null) {
       setText(history);
       setShowQRCode(true);
-      qrCodeGenerate();
+      setInputText(history);
     }
   }, []);
 
