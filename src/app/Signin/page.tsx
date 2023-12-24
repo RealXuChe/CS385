@@ -9,10 +9,16 @@ import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-import { Checkbox, FormControlLabel, InputAdornment } from "@mui/material";
-import React from "react";
+import {
+  Checkbox,
+  FormControlLabel,
+  InputAdornment,
+  Typography,
+} from "@mui/material";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const buttonTheme = createTheme({
   palette: {
@@ -78,6 +84,45 @@ export default function Signin() {
   ) => {
     event.preventDefault();
   };
+  let name = useRef<string | null>(null);
+  let passwd = useRef<string | null>(null);
+  let [errorStat, setErrorStat] = useState<string | null>(null);
+  const route = useRouter();
+  function signInHandler() {
+    if (name.current === null || passwd.current === null) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("username", name.current);
+    formData.append("password", passwd.current);
+
+    const requestOptions = {
+      method: "POST" as "POST",
+      redirect: "follow" as "follow",
+      body: formData,
+    };
+
+    fetch("http://120.26.3.153:8080/login", requestOptions)
+      .then((response) => {
+        return response.json() as Promise<{
+          statusCode: number;
+          statusMsg: string;
+          data: { token: string; username: string; avatar: string };
+        }>;
+      })
+      .then((result) => {
+        if (result.statusCode != 200) {
+          setErrorStat(result.statusMsg);
+          return;
+        }
+        localStorage.setItem("token", result.data.token);
+        localStorage.setItem("username", result.data.username);
+        localStorage.setItem("avatar", result.data.avatar);
+        route.push("/");
+      })
+      .catch((error) => console.log("error", error));
+  }
   return (
     <div>
       <div
@@ -111,6 +156,9 @@ export default function Signin() {
               label="Username"
               required={true}
               className=" w-[24.5rem]"
+              onBlur={(e) => {
+                name.current = e.currentTarget.value;
+              }}
             ></TextField>
           </ThemeProvider>
         </div>
@@ -139,11 +187,20 @@ export default function Signin() {
                     </IconButton>
                   </InputAdornment>
                 }
+                onBlur={(e) => {
+                  passwd.current = e.currentTarget.value;
+                }}
                 label="Password"
               />
             </FormControl>
           </ThemeProvider>
         </div>
+
+        {errorStat !== null && (
+          <Typography className="ml-[2.56rem]" color="error" variant="caption">
+            {errorStat}
+          </Typography>
+        )}
 
         {/*需要修改一下remember me的颜色#727D8D*/}
         <div className="ml-[2.56rem]">
@@ -160,6 +217,7 @@ export default function Signin() {
               variant="contained"
               color={"primary"}
               className="rounded-full bg-indigo-500 px-8"
+              onClick={signInHandler}
             >
               <p className="text-[1.6rem] text-[#FFFFFF]">sign in</p>
             </Button>
