@@ -61,6 +61,9 @@ class CIDR {
       bin_repr >>= 8;
     }
     seg.reverse();
+    for (var i = 0; i < seg.length; ++i) {
+      if (seg[i] < 0) seg[i] *= -1;
+    }
     let addr = "";
     for (let i = 0; i < seg.length - 1; i++) {
       addr = addr.concat(seg[i].toString(), ".");
