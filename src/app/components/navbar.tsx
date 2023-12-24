@@ -8,6 +8,10 @@ const jump = (to: string) => {
 
 export default function Navbar() {
   const router = useRouter();
+  const name =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("username")
+      : null;
   return (
     <header
       className="sticky top-0 left-0 right-0 h-16 flex items-center justify-between px-6
@@ -25,7 +29,7 @@ export default function Navbar() {
       <nav>
         <ul className="flex space-x-4">
           {(() => {
-            if (localStorage.getItem("username") === null) {
+            if (name === null) {
               return (
                 <li>
                   <Link
