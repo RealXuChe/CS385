@@ -56,6 +56,17 @@ export default function Navbar() {
                         localStorage.removeItem("token");
                         localStorage.removeItem("username");
                         localStorage.removeItem("avatar");
+                        const names = [
+                          "cidr-calculator",
+                          "ieee754",
+                          "bintree",
+                          "Function_diagram",
+                          "QR-Code",
+                          "unit-conversion",
+                        ];
+                        for (const name of names) {
+                          localStorage.removeItem(name);
+                        }
                         router.refresh();
                       }}
                     >

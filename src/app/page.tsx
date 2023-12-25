@@ -120,8 +120,8 @@ const HistoryCard = () => {
   return (
     <div>
       {historyItems.map((event: any, index: number) => (
-        // eslint-disable-next-line react/jsx-key
         <Link
+          key={index + "aaaa"}
           href={
             "/toolbox/" +
             historyItems[index]["tool"] +
