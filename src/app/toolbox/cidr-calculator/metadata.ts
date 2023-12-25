@@ -4,7 +4,7 @@ const meta: ToolMeta = {
   name: "CIDR Calculator",
   route: "/toolbox/cidr-calculator",
   icon: "icon-cidr.svg",
-  introduction: "This is an introduction",
+  introduction: "Calculate the CIDR, supports subtraction",
 };
 
 export default meta;

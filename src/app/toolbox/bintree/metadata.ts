@@ -4,7 +4,7 @@ const bintree_meta: ToolMeta = {
   name: "Binary Tree Viewer",
   route: "/toolbox/bintree",
   icon: "icon-binary.svg",
-  introduction: "This is an introduction",
+  introduction: "Draw a binary tree dynamically",
 };
 
 export default bintree_meta;

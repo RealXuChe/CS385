@@ -4,7 +4,7 @@ const fp_meta: ToolMeta = {
   name: "Floating Point Number Viewer",
   route: "/toolbox/ieee754",
   icon: "icon-floating.svg",
-  introduction: "This is an introduction",
+  introduction: "Learn IEEE754 standard visually",
 };
 
 export default fp_meta;
