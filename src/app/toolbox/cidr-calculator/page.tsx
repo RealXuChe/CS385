@@ -241,7 +241,9 @@ export default function Home() {
             // placeholder="127.0.0.1/20"
             variant="outlined"
             value={inputValue}
-            onChange={(e) => (inputRef.current = e.target.value)}
+            onChange={(e) => (
+              (inputRef.current = e.target.value), setInputValue(e.target.value)
+            )}
           />
         </Grid>
         <Grid item>
