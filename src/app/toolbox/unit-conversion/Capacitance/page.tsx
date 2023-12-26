@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -13,12 +13,62 @@ import {
 import { UnitConverter } from "@/app/toolbox/unit-conversion/UnitConverter/unitconverter";
 
 export default function UnitConversionTool() {
+  const toolName = "unit-conversion";
+  const formatDate = (date: Date) => {
+    return (
+      date.getFullYear() +
+      "-" +
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2) +
+      " " +
+      ("0" + date.getHours()).slice(-2) +
+      ":" +
+      ("0" + date.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + date.getSeconds()).slice(-2)
+    );
+  };
+
+  const saveHistory = (
+    unit: string,
+    size: string,
+    fromunit: string,
+    tounit: string,
+  ) => {
+    let rawInfo = localStorage.getItem(toolName);
+    if (rawInfo == null) {
+      // 如果当前工具的历史记录是空的，则创建仅包含当前询问记录的数组
+      let newInfo = {
+        query: [[unit, size, fromunit, tounit]],
+        time: [formatDate(new Date())],
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    } else {
+      // 如果当前工具已有历史记录，则追加当前询问记录到数组末尾
+      let parsedInfo = JSON.parse(rawInfo);
+      let queries = parsedInfo["query"];
+      let times = parsedInfo["time"];
+      let nowQuery = [unit, size, fromunit, tounit];
+      let nowTime = formatDate(new Date());
+      queries.push(nowQuery);
+      times.push(nowTime);
+      let newInfo = {
+        query: queries,
+        time: times,
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    }
+  };
   const [state, setState] = useState({
+    capacitance: "",
     capacitanceResult: 0,
   });
 
   const inputRef = useRef({
-    Capacitance: { capacitance: 0, fromUnit: "", toUnit: "" },
+    Capacitance: { fromUnit: "", toUnit: "" },
   });
 
   const containerStyle = {
@@ -50,14 +100,30 @@ export default function UnitConversionTool() {
     marginBottom: "7px",
   };
   const handleCapacitanceConvert = () => {
-    const { capacitance, fromUnit, toUnit } = inputRef.current.Capacitance;
+    const { fromUnit, toUnit } = inputRef.current.Capacitance;
     const result = UnitConverter.convertCapacitance(
-      capacitance,
+      parseFloat(state.capacitance),
       fromUnit,
       toUnit,
     );
     setState({ ...state, capacitanceResult: result });
   };
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      const sysval = history.split(",").slice(1);
+      const sta = [sysval[0], 0];
+
+      Object.keys(state).forEach((key, index) => {
+        (state as any)[key] = sta[index];
+      });
+      inputRef.current.Capacitance.fromUnit = sysval[1];
+      inputRef.current.Capacitance.toUnit = sysval[2];
+      handleCapacitanceConvert();
+    }
+  }, []);
 
   return (
     <div style={containerStyle}>
@@ -68,10 +134,10 @@ export default function UnitConversionTool() {
             <TextField
               style={textfieldStyle}
               label="Value"
-              onChange={(e) =>
-                (inputRef.current.Capacitance.capacitance =
-                  parseFloat(e.target.value) || 0)
-              }
+              value={state.capacitance}
+              onChange={(e) => {
+                setState({ ...state, capacitance: e.target.value });
+              }}
             />
             <FormControl fullWidth>
               <InputLabel id="capacitanceFromUnitLabel" sx={inputlabelStyle}>
@@ -138,7 +204,19 @@ export default function UnitConversionTool() {
                 {/* Add more units as needed */}
               </Select>
             </FormControl>
-            <Button onClick={handleCapacitanceConvert}>Convert</Button>
+            <Button
+              onClick={(e) => {
+                handleCapacitanceConvert();
+                saveHistory(
+                  "Capacitance",
+                  state.capacitance,
+                  inputRef.current.Capacitance.fromUnit,
+                  inputRef.current.Capacitance.toUnit,
+                );
+              }}
+            >
+              Convert
+            </Button>
             <p>Result: {state.capacitanceResult}</p>
           </Paper>
         </Grid>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -13,12 +13,63 @@ import {
 import { UnitConverter } from "@/app/toolbox/unit-conversion/UnitConverter/unitconverter";
 
 export default function UnitConversionTool() {
+  const toolName = "unit-conversion";
+  const formatDate = (date: Date) => {
+    return (
+      date.getFullYear() +
+      "-" +
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2) +
+      " " +
+      ("0" + date.getHours()).slice(-2) +
+      ":" +
+      ("0" + date.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + date.getSeconds()).slice(-2)
+    );
+  };
+
+  const saveHistory = (
+    unit: string,
+    size: string,
+    fromunit: string,
+    tounit: string,
+  ) => {
+    let rawInfo = localStorage.getItem(toolName);
+    if (rawInfo == null) {
+      // 如果当前工具的历史记录是空的，则创建仅包含当前询问记录的数组
+      let newInfo = {
+        query: [[unit, size, fromunit, tounit]],
+        time: [formatDate(new Date())],
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    } else {
+      // 如果当前工具已有历史记录，则追加当前询问记录到数组末尾
+      let parsedInfo = JSON.parse(rawInfo);
+      let queries = parsedInfo["query"];
+      let times = parsedInfo["time"];
+      let nowQuery = [unit, size, fromunit, tounit];
+      let nowTime = formatDate(new Date());
+      queries.push(nowQuery);
+      times.push(nowTime);
+      let newInfo = {
+        query: queries,
+        time: times,
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    }
+  };
+
   const [state, setState] = useState({
+    inductance: "",
     inductanceResult: 0,
   });
 
   const inputRef = useRef({
-    Inductance: { inductance: 0, fromUnit: "", toUnit: "" },
+    Inductance: { fromUnit: "", toUnit: "" },
   });
 
   const containerStyle = {
@@ -50,14 +101,29 @@ export default function UnitConversionTool() {
     marginBottom: "7px",
   };
   const handleInductanceConvert = () => {
-    const { inductance, fromUnit, toUnit } = inputRef.current.Inductance;
+    const { fromUnit, toUnit } = inputRef.current.Inductance;
     const result = UnitConverter.convertInductance(
-      inductance,
+      parseFloat(state.inductance),
       fromUnit,
       toUnit,
     );
     setState({ ...state, inductanceResult: result });
   };
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      const sysval = history.split(",").slice(1);
+      const sta = [sysval[0], 0];
+      Object.keys(state).forEach((key, index) => {
+        (state as any)[key] = sta[index];
+      });
+      inputRef.current.Inductance.fromUnit = sysval[1];
+      inputRef.current.Inductance.toUnit = sysval[2];
+      handleInductanceConvert();
+    }
+  }, []);
 
   return (
     <div style={containerStyle}>
@@ -68,10 +134,10 @@ export default function UnitConversionTool() {
             <TextField
               style={textfieldStyle}
               label="Value"
-              onChange={(e) =>
-                (inputRef.current.Inductance.inductance =
-                  parseFloat(e.target.value) || 0)
-              }
+              value={state.inductance}
+              onChange={(e) => {
+                setState({ ...state, inductance: e.target.value });
+              }}
             />
             <FormControl fullWidth>
               <InputLabel id="inductanceFromUnitLabel" sx={inputlabelStyle}>
@@ -126,7 +192,19 @@ export default function UnitConversionTool() {
                 {/* Add more units as needed */}
               </Select>
             </FormControl>
-            <Button onClick={handleInductanceConvert}>Convert</Button>
+            <Button
+              onClick={(e) => {
+                handleInductanceConvert();
+                saveHistory(
+                  "Inductance",
+                  state.inductance,
+                  inputRef.current.Inductance.fromUnit,
+                  inputRef.current.Inductance.toUnit,
+                );
+              }}
+            >
+              Convert
+            </Button>
             <p>Result: {state.inductanceResult}</p>
           </Paper>
         </Grid>
