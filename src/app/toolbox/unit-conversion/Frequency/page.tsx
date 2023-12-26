@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -13,12 +13,62 @@ import {
 import { UnitConverter } from "@/app/toolbox/unit-conversion/UnitConverter/unitconverter";
 
 export default function UnitConversionTool() {
+  const toolName = "unit-conversion";
+  const formatDate = (date: Date) => {
+    return (
+      date.getFullYear() +
+      "-" +
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2) +
+      " " +
+      ("0" + date.getHours()).slice(-2) +
+      ":" +
+      ("0" + date.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + date.getSeconds()).slice(-2)
+    );
+  };
+
+  const saveHistory = (
+    unit: string,
+    size: string,
+    fromunit: string,
+    tounit: string,
+  ) => {
+    let rawInfo = localStorage.getItem(toolName);
+    if (rawInfo == null) {
+      // 如果当前工具的历史记录是空的，则创建仅包含当前询问记录的数组
+      let newInfo = {
+        query: [[unit, size, fromunit, tounit]],
+        time: [formatDate(new Date())],
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    } else {
+      // 如果当前工具已有历史记录，则追加当前询问记录到数组末尾
+      let parsedInfo = JSON.parse(rawInfo);
+      let queries = parsedInfo["query"];
+      let times = parsedInfo["time"];
+      let nowQuery = [unit, size, fromunit, tounit];
+      let nowTime = formatDate(new Date());
+      queries.push(nowQuery);
+      times.push(nowTime);
+      let newInfo = {
+        query: queries,
+        time: times,
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    }
+  };
   const [state, setState] = useState({
+    frequency: "",
     clockFrequencyResult: 0,
   });
 
   const inputRef = useRef({
-    clockFrequency: { frequency: 0, fromUnit: "", toUnit: "" },
+    clockFrequency: { fromUnit: "", toUnit: "" },
   });
 
   const containerStyle = {
@@ -50,14 +100,30 @@ export default function UnitConversionTool() {
   };
 
   const handleClockFrequencyConvert = () => {
-    const { frequency, fromUnit, toUnit } = inputRef.current.clockFrequency;
+    const { fromUnit, toUnit } = inputRef.current.clockFrequency;
     const result = UnitConverter.convertClockFrequency(
-      frequency,
+      parseFloat(state.frequency),
       fromUnit,
       toUnit,
     );
     setState({ ...state, clockFrequencyResult: result });
   };
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      const sysval = history.split(",").slice(1);
+      const sta = [sysval[0], 0];
+
+      Object.keys(state).forEach((key, index) => {
+        (state as any)[key] = sta[index];
+      });
+      inputRef.current.clockFrequency.fromUnit = sysval[1];
+      inputRef.current.clockFrequency.toUnit = sysval[2];
+      handleClockFrequencyConvert();
+    }
+  }, []);
 
   return (
     <div style={containerStyle}>
@@ -69,10 +135,10 @@ export default function UnitConversionTool() {
             <TextField
               style={textfieldStyle}
               label="Frequency"
-              onChange={(e) =>
-                (inputRef.current.clockFrequency.frequency =
-                  parseFloat(e.target.value) || 0)
-              }
+              value={state.frequency}
+              onChange={(e) => {
+                setState({ ...state, frequency: e.target.value });
+              }}
             />
             <FormControl fullWidth>
               <InputLabel id="fromUnitLabelClock" sx={inputlabelStyle}>
@@ -119,7 +185,19 @@ export default function UnitConversionTool() {
                 <MenuItem value="EHz">EHz</MenuItem>
               </Select>
             </FormControl>
-            <Button onClick={handleClockFrequencyConvert}>Convert</Button>
+            <Button
+              onClick={(e) => {
+                handleClockFrequencyConvert();
+                saveHistory(
+                  "Frequency",
+                  state.frequency,
+                  inputRef.current.clockFrequency.fromUnit,
+                  inputRef.current.clockFrequency.toUnit,
+                );
+              }}
+            >
+              Convert
+            </Button>
             <p>Result: {state.clockFrequencyResult}</p>
           </Paper>
         </Grid>
