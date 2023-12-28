@@ -84,6 +84,8 @@ const HistoryCard = () => {
       Function_diagram: "Function diagram",
       "QR-Code": "QR Code",
       "unit-conversion": "Unit Conversion",
+      HEX: "HEX Converter",
+      "Color-code": "Color Code Converter",
     };
 
     let items = [];

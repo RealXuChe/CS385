@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Grid, IconButton } from "@mui/material";
 import StorageIcon from "@mui/icons-material/Storage";
 import VibrationIcon from "@mui/icons-material/Vibration";
@@ -16,6 +16,16 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import Link from "next/link";
 
 const IconNavigation = () => {
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      const sys = history.split(",");
+      console.log(" :", history);
+      window.location.href = `/toolbox/unit-conversion/${sys[0]}?history=${history}`;
+    }
+  }, []);
+
   const buttonStyle = {
     width: "100%",
     height: "100%",

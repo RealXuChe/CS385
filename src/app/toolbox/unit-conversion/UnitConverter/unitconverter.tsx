@@ -6,33 +6,34 @@ export class UnitConverter {
     size: number,
     fromUnit: string,
     toUnit: string,
-    unitSystem: string,
   ): string {
-    const units: Record<string, Record<string, string>> = {
-      binary: {
-        B: "1",
-        KiB: "1024",
-        MiB: "1048576",
-        GiB: "1073741824",
-        TiB: "1099511627776",
-        PiB: "1125899906842624",
-        EiB: "1152921504606846976",
-      },
-      decimal: {
-        B: "1",
-        KB: "1000",
-        MB: "1000000",
-        GB: "1000000000",
-        TB: "1000000000000",
-        PB: "1000000000000000",
-        EB: "1000000000000000000",
-      },
+    const units: Record<string, string> = {
+      B: "1",
+      KiB: "1024",
+      MiB: "1048576",
+      GiB: "1073741824",
+      TiB: "1099511627776",
+      PiB: "1125899906842624",
+      EiB: "1152921504606846976",
+      KB: "1000",
+      MB: "1000000",
+      GB: "1000000000",
+      TB: "1000000000000",
+      PB: "1000000000000000",
+      EB: "1000000000000000000",
     };
-    const conversionFactors = units[unitSystem];
-    const result = new BigNumber(size)
-      .times(conversionFactors[fromUnit])
-      .dividedBy(conversionFactors[toUnit]);
-    return result.toString();
+    const conversionFactors = units;
+    if (
+      (fromUnit.length === 2 && toUnit.length === 3) ||
+      (fromUnit.length === 3 && toUnit.length === 2)
+    ) {
+      return "Different bases, No conversion relationship";
+    } else {
+      const result = new BigNumber(size)
+        .times(conversionFactors[fromUnit])
+        .dividedBy(conversionFactors[toUnit]);
+      return result.toString();
+    }
   }
 
   static convertClockFrequency(

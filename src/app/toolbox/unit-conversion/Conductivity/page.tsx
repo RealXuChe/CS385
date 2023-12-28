@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -13,12 +13,63 @@ import {
 import { UnitConverter } from "@/app/toolbox/unit-conversion/UnitConverter/unitconverter";
 
 export default function UnitConversionTool() {
+  const toolName = "unit-conversion";
+  const formatDate = (date: Date) => {
+    return (
+      date.getFullYear() +
+      "-" +
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2) +
+      " " +
+      ("0" + date.getHours()).slice(-2) +
+      ":" +
+      ("0" + date.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + date.getSeconds()).slice(-2)
+    );
+  };
+
+  const saveHistory = (
+    unit: string,
+    size: string,
+    fromunit: string,
+    tounit: string,
+  ) => {
+    let rawInfo = localStorage.getItem(toolName);
+    if (rawInfo == null) {
+      // 如果当前工具的历史记录是空的，则创建仅包含当前询问记录的数组
+      let newInfo = {
+        query: [[unit, size, fromunit, tounit]],
+        time: [formatDate(new Date())],
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    } else {
+      // 如果当前工具已有历史记录，则追加当前询问记录到数组末尾
+      let parsedInfo = JSON.parse(rawInfo);
+      let queries = parsedInfo["query"];
+      let times = parsedInfo["time"];
+      let nowQuery = [unit, size, fromunit, tounit];
+      let nowTime = formatDate(new Date());
+      queries.push(nowQuery);
+      times.push(nowTime);
+      let newInfo = {
+        query: queries,
+        time: times,
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    }
+  };
+
   const [state, setState] = useState({
+    conductivity: "",
     conductivityResult: 0,
   });
 
   const inputRef = useRef({
-    Conductivity: { conductivity: 0, fromUnit: "", toUnit: "" },
+    Conductivity: { fromUnit: "", toUnit: "" },
   });
 
   const containerStyle = {
@@ -50,14 +101,30 @@ export default function UnitConversionTool() {
     marginBottom: "7px",
   };
   const handleConductivityConvert = () => {
-    const { conductivity, fromUnit, toUnit } = inputRef.current.Conductivity;
+    const { fromUnit, toUnit } = inputRef.current.Conductivity;
     const result = UnitConverter.convertConductivity(
-      conductivity,
+      parseFloat(state.conductivity),
       fromUnit,
       toUnit,
     );
     setState({ ...state, conductivityResult: result });
   };
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      const sysval = history.split(",").slice(1);
+      const sta = [sysval[0], 0];
+
+      Object.keys(state).forEach((key, index) => {
+        (state as any)[key] = sta[index];
+      });
+      inputRef.current.Conductivity.fromUnit = sysval[1];
+      inputRef.current.Conductivity.toUnit = sysval[2];
+      handleConductivityConvert();
+    }
+  }, []);
 
   return (
     <div style={containerStyle}>
@@ -68,10 +135,10 @@ export default function UnitConversionTool() {
             <TextField
               style={textfieldStyle}
               label="Value"
-              onChange={(e) =>
-                (inputRef.current.Conductivity.conductivity =
-                  parseFloat(e.target.value) || 0)
-              }
+              value={state.conductivity}
+              onChange={(e) => {
+                setState({ ...state, conductivity: e.target.value });
+              }}
             />
             <FormControl fullWidth>
               <InputLabel id="conductivityFromUnitLabel" sx={inputlabelStyle}>
@@ -118,7 +185,19 @@ export default function UnitConversionTool() {
                 {/* Add more units as needed */}
               </Select>
             </FormControl>
-            <Button onClick={handleConductivityConvert}>Convert</Button>
+            <Button
+              onClick={(e) => {
+                handleConductivityConvert();
+                saveHistory(
+                  "Conductivity",
+                  state.conductivity,
+                  inputRef.current.Conductivity.fromUnit,
+                  inputRef.current.Conductivity.toUnit,
+                );
+              }}
+            >
+              Convert
+            </Button>
             <p>Result: {state.conductivityResult}</p>
           </Paper>
         </Grid>

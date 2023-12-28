@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -10,18 +10,66 @@ import {
   InputLabel,
   FormControl,
 } from "@mui/material";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import { UnitConverter } from "@/app/toolbox/unit-conversion/UnitConverter/unitconverter";
 
 export default function UnitConversionTool() {
+  const toolName = "unit-conversion";
+  const formatDate = (date: Date) => {
+    return (
+      date.getFullYear() +
+      "-" +
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2) +
+      " " +
+      ("0" + date.getHours()).slice(-2) +
+      ":" +
+      ("0" + date.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + date.getSeconds()).slice(-2)
+    );
+  };
+
+  const saveHistory = (
+    unit: string,
+    size: string,
+    fromunit: string,
+    tounit: string,
+  ) => {
+    let rawInfo = localStorage.getItem(toolName);
+    if (rawInfo == null) {
+      // 如果当前工具的历史记录是空的，则创建仅包含当前询问记录的数组
+      let newInfo = {
+        query: [[unit, size, fromunit, tounit]],
+        time: [formatDate(new Date())],
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    } else {
+      // 如果当前工具已有历史记录，则追加当前询问记录到数组末尾
+      let parsedInfo = JSON.parse(rawInfo);
+      let queries = parsedInfo["query"];
+      let times = parsedInfo["time"];
+      let nowQuery = [unit, size, fromunit, tounit];
+      let nowTime = formatDate(new Date());
+      queries.push(nowQuery);
+      times.push(nowTime);
+      let newInfo = {
+        query: queries,
+        time: times,
+      };
+      let newInfoStr = JSON.stringify(newInfo);
+      localStorage.setItem(toolName, newInfoStr);
+    }
+  };
+
   const [state, setState] = useState({
+    size: "",
     storageSizeResult: "",
   });
 
   const inputRef = useRef({
-    storageSize: { size: 0, fromUnit: "", toUnit: "", unitSystem: "binary" },
+    storageSize: { size: 0, fromUnit: "", toUnit: "" },
   });
 
   const containerStyle = {
@@ -51,23 +99,31 @@ export default function UnitConversionTool() {
   const selectStyle1 = {
     marginBottom: "7px",
   };
-  const handleUnitSystemChange = (e: { target: { value: String } }) => {
-    const value = e.target.value as string;
-    inputRef.current.storageSize.unitSystem = value;
-    inputRef.current.storageSize.fromUnit = "";
-    inputRef.current.storageSize.toUnit = "";
-    setState({ ...state, storageSizeResult: "" });
-  };
+
   const handleStorageSizeConvert = () => {
-    const { size, fromUnit, toUnit, unitSystem } = inputRef.current.storageSize;
+    const { fromUnit, toUnit } = inputRef.current.storageSize;
     const result = UnitConverter.convertStorageSize(
-      size,
+      parseFloat(state.size),
       fromUnit,
       toUnit,
-      unitSystem,
     );
     setState({ ...state, storageSizeResult: result });
   };
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const history = queryParams.get("history");
+    if (history != null) {
+      const sysval = history.split(",").slice(1);
+      const sta = [sysval[0], 0];
+      Object.keys(state).forEach((key, index) => {
+        (state as any)[key] = sta[index];
+      });
+      inputRef.current.storageSize.fromUnit = sysval[1];
+      inputRef.current.storageSize.toUnit = sysval[2];
+      handleStorageSizeConvert();
+    }
+  }, []);
 
   return (
     <div style={containerStyle}>
@@ -79,123 +135,84 @@ export default function UnitConversionTool() {
             <TextField
               style={textfieldStyle}
               label="Size"
-              onChange={(e) =>
-                (inputRef.current.storageSize.size =
-                  parseFloat(e.target.value) || 0)
-              }
+              value={state.size}
+              onChange={(e) => {
+                setState({ ...state, size: e.target.value });
+              }}
             />
-
-            <FormControl component="fieldset" fullWidth>
-              <RadioGroup
-                row
-                aria-label="unit-system"
-                name="unit-system"
-                value={inputRef.current.storageSize.unitSystem}
-                onChange={handleUnitSystemChange}
-              >
-                <FormControlLabel
-                  value="binary"
-                  control={<Radio />}
-                  label="Binary"
-                />
-                <FormControlLabel
-                  value="decimal"
-                  control={<Radio />}
-                  label="Decimal"
-                />
-              </RadioGroup>
-            </FormControl>
 
             <FormControl fullWidth>
               <InputLabel id="fromUnitLabel" sx={inputlabelStyle}>
                 From Unit
               </InputLabel>
-              {inputRef.current.storageSize.unitSystem === "binary" ? (
-                <Select
-                  style={selectStyle1}
-                  labelId="fromUnitLabel"
-                  value={inputRef.current.storageSize.fromUnit}
-                  onChange={(e) => {
-                    const value = e.target.value as string;
-                    inputRef.current.storageSize.fromUnit = value;
-                    setState({ ...state });
-                  }}
-                >
-                  <MenuItem value="B">B</MenuItem>
-                  <MenuItem value="KiB">KiB</MenuItem>
-                  <MenuItem value="MiB">MiB</MenuItem>
-                  <MenuItem value="GiB">GiB</MenuItem>
-                  <MenuItem value="TiB">TiB</MenuItem>
-                  <MenuItem value="PiB">PiB</MenuItem>
-                  <MenuItem value="EiB">EiB</MenuItem>
-                </Select>
-              ) : (
-                <Select
-                  style={selectStyle1}
-                  labelId="fromUnitLabel"
-                  value={inputRef.current.storageSize.fromUnit}
-                  onChange={(e) => {
-                    const value = e.target.value as string;
-                    inputRef.current.storageSize.fromUnit = value;
-                    setState({ ...state });
-                  }}
-                >
-                  <MenuItem value="B">B</MenuItem>
-                  <MenuItem value="KB">KB</MenuItem>
-                  <MenuItem value="MB">MB</MenuItem>
-                  <MenuItem value="GB">GB</MenuItem>
-                  <MenuItem value="TB">TB</MenuItem>
-                  <MenuItem value="PB">PB</MenuItem>
-                  <MenuItem value="EB">EB</MenuItem>
-                </Select>
-              )}
+              <Select
+                style={selectStyle1}
+                labelId="fromUnitLabel"
+                value={inputRef.current.storageSize.fromUnit}
+                onChange={(e) => {
+                  const value = e.target.value as string;
+                  inputRef.current.storageSize.fromUnit = value;
+                  setState({ ...state });
+                }}
+              >
+                <MenuItem value="B">B</MenuItem>
+                <MenuItem value="KiB">KiB</MenuItem>
+                <MenuItem value="MiB">MiB</MenuItem>
+                <MenuItem value="GiB">GiB</MenuItem>
+                <MenuItem value="TiB">TiB</MenuItem>
+                <MenuItem value="PiB">PiB</MenuItem>
+                <MenuItem value="EiB">EiB</MenuItem>
+                <MenuItem value="KB">KB</MenuItem>
+                <MenuItem value="MB">MB</MenuItem>
+                <MenuItem value="GB">GB</MenuItem>
+                <MenuItem value="TB">TB</MenuItem>
+                <MenuItem value="PB">PB</MenuItem>
+                <MenuItem value="EB">EB</MenuItem>
+              </Select>
             </FormControl>
 
             <FormControl fullWidth>
               <InputLabel id="toUnitLabel" sx={inputlabelStyle}>
                 To Unit
               </InputLabel>
-              {inputRef.current.storageSize.unitSystem === "binary" ? (
-                <Select
-                  style={selectStyle1}
-                  labelId="fromUnitLabel"
-                  value={inputRef.current.storageSize.toUnit}
-                  onChange={(e) => {
-                    const value = e.target.value as string;
-                    inputRef.current.storageSize.toUnit = value;
-                    setState({ ...state });
-                  }}
-                >
-                  <MenuItem value="B">B</MenuItem>
-                  <MenuItem value="KiB">KiB</MenuItem>
-                  <MenuItem value="MiB">MiB</MenuItem>
-                  <MenuItem value="GiB">GiB</MenuItem>
-                  <MenuItem value="TiB">TiB</MenuItem>
-                  <MenuItem value="PiB">PiB</MenuItem>
-                  <MenuItem value="EiB">EiB</MenuItem>
-                </Select>
-              ) : (
-                <Select
-                  style={selectStyle1}
-                  labelId="fromUnitLabel"
-                  value={inputRef.current.storageSize.toUnit}
-                  onChange={(e) => {
-                    const value = e.target.value as string;
-                    inputRef.current.storageSize.toUnit = value;
-                    setState({ ...state });
-                  }}
-                >
-                  <MenuItem value="B">B</MenuItem>
-                  <MenuItem value="KB">KB</MenuItem>
-                  <MenuItem value="MB">MB</MenuItem>
-                  <MenuItem value="GB">GB</MenuItem>
-                  <MenuItem value="TB">TB</MenuItem>
-                  <MenuItem value="PB">PB</MenuItem>
-                  <MenuItem value="EB">EB</MenuItem>
-                </Select>
-              )}
+              <Select
+                style={selectStyle1}
+                labelId="toUnitLabel"
+                value={inputRef.current.storageSize.toUnit}
+                onChange={(e) => {
+                  const value = e.target.value as string;
+                  inputRef.current.storageSize.toUnit = value;
+                  setState({ ...state });
+                }}
+              >
+                <MenuItem value="B">B</MenuItem>
+                <MenuItem value="KiB">KiB</MenuItem>
+                <MenuItem value="MiB">MiB</MenuItem>
+                <MenuItem value="GiB">GiB</MenuItem>
+                <MenuItem value="TiB">TiB</MenuItem>
+                <MenuItem value="PiB">PiB</MenuItem>
+                <MenuItem value="EiB">EiB</MenuItem>
+                <MenuItem value="KB">KB</MenuItem>
+                <MenuItem value="MB">MB</MenuItem>
+                <MenuItem value="GB">GB</MenuItem>
+                <MenuItem value="TB">TB</MenuItem>
+                <MenuItem value="PB">PB</MenuItem>
+                <MenuItem value="EB">EB</MenuItem>
+              </Select>
             </FormControl>
-            <Button onClick={handleStorageSizeConvert}>Convert</Button>
+            <Button
+              onClick={(e) => {
+                handleStorageSizeConvert();
+                saveHistory(
+                  "storage_size",
+                  state.size,
+                  inputRef.current.storageSize.fromUnit,
+                  inputRef.current.storageSize.toUnit,
+                );
+              }}
+            >
+              Convert
+            </Button>
             <p>Result: {state.storageSizeResult}</p>
           </Paper>
         </Grid>
