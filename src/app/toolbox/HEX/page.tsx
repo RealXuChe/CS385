@@ -32,7 +32,6 @@ const NumberConverter = () => {
   const saveHistory = (type: string, code: string) => {
     let rawInfo = localStorage.getItem(toolName);
     if (rawInfo == null) {
-      // 如果当前工具的历史记录是空的，则创建仅包含当前询问记录的数组
       let newInfo = {
         query: [[type, code]],
         time: [formatDate(new Date())],
@@ -40,7 +39,6 @@ const NumberConverter = () => {
       let newInfoStr = JSON.stringify(newInfo);
       localStorage.setItem(toolName, newInfoStr);
     } else {
-      // 如果当前工具已有历史记录，则追加当前询问记录到数组末尾
       let parsedInfo = JSON.parse(rawInfo);
       let queries = parsedInfo["query"];
       let times = parsedInfo["time"];
