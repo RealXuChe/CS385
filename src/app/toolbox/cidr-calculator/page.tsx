@@ -15,24 +15,24 @@ import NetworkCheckIcon from "@mui/icons-material/NetworkCheck"; // Import an ic
 import { useRef, useState, useEffect } from "react";
 
 class CIDR {
-  private prefix_len: number;
-  private addr_num: number;
-  private mask_num: number;
+  private prefix_len: bigint;
+  private addr_num: bigint;
+  private mask_num: bigint;
 
   static from_str(s: string) {
     let arr = s.split("/");
     let addr = arr[0];
     let ip_seg = addr.split(".");
 
-    let prefix_len = parseInt(arr[1]);
+    let prefix_len = BigInt(parseInt(arr[1]));
 
-    let addr_pfx = 0;
+    let addr_pfx = BigInt(0);
     for (let i = 0; i < 4; i++) {
-      addr_pfx <<= 8;
-      addr_pfx += parseInt(ip_seg[i]);
+      addr_pfx <<= BigInt(8);
+      addr_pfx += BigInt(parseInt(ip_seg[i]));
     }
-    addr_pfx >>= 32 - prefix_len;
-    addr_pfx <<= 32 - prefix_len;
+    addr_pfx >>= BigInt(32) - prefix_len;
+    addr_pfx <<= BigInt(32) - prefix_len;
     return new CIDR(prefix_len, addr_pfx);
   }
 
@@ -41,29 +41,26 @@ class CIDR {
    *
    * @param {number} pl - prefix length
    * @param {number} pf - address prefix*/
-  constructor(pl: number, pf: number) {
+  constructor(pl: bigint, pf: bigint) {
     this.prefix_len = pl;
 
     this.addr_num = pf;
 
-    this.mask_num = 0;
+    this.mask_num = BigInt(0);
     for (let i = 0; i < this.prefix_len; i++) {
-      this.mask_num |= 1 << i;
+      this.mask_num |= BigInt(1) << BigInt(i);
     }
-    this.mask_num <<= 32 - this.prefix_len;
+    this.mask_num <<= BigInt(32) - this.prefix_len;
   }
 
   info() {
     let seg = [];
     let bin_repr = this.addr_num;
     for (let i = 0; i < 4; i++) {
-      seg.push(bin_repr % (1 << 8));
-      bin_repr >>= 8;
+      seg.push(bin_repr % (BigInt(1) << BigInt(8)));
+      bin_repr >>= BigInt(8);
     }
     seg.reverse();
-    for (var i = 0; i < seg.length; ++i) {
-      if (seg[i] < 0) seg[i] *= -1;
-    }
     let addr = "";
     for (let i = 0; i < seg.length - 1; i++) {
       addr = addr.concat(seg[i].toString(), ".");
@@ -90,14 +87,15 @@ class CIDR {
   }
 
   bisect(): CIDR[] {
-    if (this.prefix_len === 32) {
+    if (this.prefix_len === BigInt(32)) {
       return Array.of(this);
     } else {
       return Array.of(
-        new CIDR(this.prefix_len + 1, this.addr_num),
+        new CIDR(this.prefix_len + BigInt(1), this.addr_num),
         new CIDR(
-          this.prefix_len + 1,
-          this.addr_num | (1 << (32 - (this.prefix_len + 1))),
+          this.prefix_len + BigInt(1),
+          this.addr_num |
+            (BigInt(1) << (BigInt(32) - (this.prefix_len + BigInt(1)))),
         ),
       );
     }
