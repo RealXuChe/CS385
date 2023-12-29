@@ -1,10 +1,10 @@
 import { ToolMeta } from "@/inlcude/tool_metadata";
 
 const cc_meta: ToolMeta = {
-  name: "Color Code Converter",
+  name: "Color Converter",
   route: "/toolbox/Color-code",
   icon: "icon-color.svg",
-  introduction: "This is an introduction",
+  introduction: "Provide conversion between HEX, RGB, CMYK, and HSV",
 };
 
 export default cc_meta;

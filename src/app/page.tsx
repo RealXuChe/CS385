@@ -205,7 +205,7 @@ export default function Home() {
           {/*Dashboard-History*/}
           <div
             className="flex flex-col flex-auto bg-[#E0CAF7] rounded-3xl shadow-lg overflow-y-auto
-            2xl:w-1/3 sm:w-1/3 desktop:max-h-[66rem] xl:max-h-[129rem]  sm:max-h-[81.5rem] max-h-[40.75rem] 2xl:ml-24 xl:ml-8 sm:ml-4 ml-4 w-1/3
+            2xl:w-1/3 sm:w-1/3 desktop:max-h-[70rem] xl:max-h-[137rem]  sm:max-h-[81.75rem] max-h-[41.25rem] 2xl:ml-24 xl:ml-8 sm:ml-4 ml-4 w-1/3
             scrollbar-thin scrollbar-thumb-[#F2EAF8]/60 scrollbar-track-[#E6D8F3] scrollbar-track-rounded-full hover:scrollbar-thumb-[#D3B8EF]/80 scrollbar-thumb-rounded-full scroll-smooth
 "
           >
