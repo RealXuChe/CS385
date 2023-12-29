@@ -9,7 +9,7 @@ import {
   Button,
 } from "@mui/material";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
-import { Converter } from "./Converter/page";
+import { Converter } from "./Converter";
 import copy from "copy-to-clipboard";
 import { HexColorPicker } from "react-colorful";
 
