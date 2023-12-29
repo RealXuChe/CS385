@@ -17,5 +17,6 @@ const buildStylelintCommand = (filenames) =>
 
 module.exports = {
   "*.{js,jsx,ts,tsx}": [buildEslintCommand, buildPrettierCommand],
-  "*.{md,html,css}": [buildPrettierCommand, buildStylelintCommand],
+  "*.{css}": [buildPrettierCommand, buildStylelintCommand],
+  "*.{md,html}": [buildPrettierCommand],
 };
