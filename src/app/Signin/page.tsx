@@ -89,40 +89,13 @@ export default function Signin() {
   let [errorStat, setErrorStat] = useState<string | null>(null);
   const route = useRouter();
   function signInHandler() {
-    if (name.current === null || passwd.current === null) {
+    if (name.current === null) {
       return;
     }
-
-    const formData = new FormData();
-    formData.append("username", name.current);
-    formData.append("password", passwd.current);
-
-    const requestOptions = {
-      method: "POST" as "POST",
-      redirect: "follow" as "follow",
-      body: formData,
-    };
-
-    fetch("http://120.26.3.153:8080/login", requestOptions)
-      .then((response) => {
-        return response.json() as Promise<{
-          statusCode: number;
-          statusMsg: string;
-          data: { token: string; username: string; avatar: string };
-        }>;
-      })
-      .then((result) => {
-        if (result.statusCode != 200) {
-          setErrorStat(result.statusMsg);
-          return;
-        }
-        localStorage.setItem("token", result.data.token);
-        localStorage.setItem("username", result.data.username);
-        localStorage.setItem("avatar", result.data.avatar);
-        route.refresh();
-        route.push("/");
-      })
-      .catch((error) => console.log("error", error));
+    localStorage.setItem("username", name.current);
+    console.log(`User ${name.current} logged in.`);
+    route.refresh();
+    route.push("/");
   }
   return (
     <div>

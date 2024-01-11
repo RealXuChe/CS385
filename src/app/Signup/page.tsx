@@ -88,32 +88,8 @@ export default function Signup() {
     if (name.current === null || passwd.current === null) {
       return;
     }
-
-    const formData = new FormData();
-    formData.append("username", name.current);
-    formData.append("password", passwd.current);
-
-    const requestOptions = {
-      method: "POST" as "POST",
-      redirect: "follow" as "follow",
-      body: formData,
-    };
-
-    fetch("http://120.26.3.153:8080/register", requestOptions)
-      .then((response) => {
-        return response.json() as Promise<{
-          statusCode: number;
-          statusMsg: string;
-        }>;
-      })
-      .then((result) => {
-        if (result.statusCode != 200) {
-          setErrorStat(result.statusMsg);
-          return;
-        }
-        route.push("/Signin");
-      })
-      .catch((error) => console.log("error", error));
+    console.log(`Username ${name.current}, Password ${passwd.current}.`);
+    route.push("/Signin");
   }
   return (
     <div>
