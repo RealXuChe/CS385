@@ -5,7 +5,7 @@ import Navbar from "@/app/components/navbar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Cepheus Toolkit",
+  title: "Andromeda Toolkit",
   description: "A powerful and feature-rich toolkit site.",
 };
 

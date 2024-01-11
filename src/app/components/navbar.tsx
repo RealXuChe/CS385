@@ -23,7 +23,7 @@ export default function Navbar() {
           href="/"
           onClick={() => jump("/")}
         >
-          Cepheus Toolkit
+          Andromeda Toolkit
         </Link>
       </h1>
       <nav>
