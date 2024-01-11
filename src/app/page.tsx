@@ -166,9 +166,6 @@ export default function Home() {
   return (
     <div className="rounded-2xl my-7 bg-[#F4F2F4] shadow-[inset_0rem_0.25rem_0.5rem_rgba(0,0,0,0.25)] pb-16">
       {/* title&icon */}
-      <div className="flex justify-center py-16">
-        <Image src="title.svg" alt={"title"} width={677} height={72}></Image>
-      </div>
       {/* search input */}
       <div className="mx-0 flex justify-center">
         {/*<input*/}

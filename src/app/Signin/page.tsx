@@ -110,13 +110,6 @@ export default function Signin() {
             relative bottom-[37rem]
             bg-[#F4F4F4]/40 border-4 border-[#FFFAFA]/20"
       >
-        <Image
-          src={"signInTitle.svg"}
-          alt={"title"}
-          width={256}
-          height={32}
-          className="mt-[3.125rem] mx-auto flex justify-center"
-        ></Image>
         <div
           className="flex justify-center mx-auto mt-[2.12rem] text-[2rem] font-bold
                 text-transparent bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-500 bg-clip-text"
