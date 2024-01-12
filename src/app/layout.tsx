@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/app/components/navbar";
+import { fontSize } from "@mui/system";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ fontSize: "10px" }}>
       <body className={`${inter.className} h-screen bg-[#EEF2F6]`}>
         <Navbar />
         <div className="flex justify-center">

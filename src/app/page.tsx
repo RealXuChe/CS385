@@ -5,10 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
-const jump = (to: string) => {
-  window.location.href = to;
-};
-
 function ToolCardBg({ meta }: { meta: ToolMeta }) {
   return (
     <div className="2xl:mb-16 xl:mb-16 sm:mb-1 mb-1 2xl:h-[12.75rem] xl:h-[12.75rem] sm:h-[9.75rem] h-[4.75rem] mx-auto">
@@ -20,7 +16,6 @@ function ToolCardBg({ meta }: { meta: ToolMeta }) {
       <Link
         href={meta.route}
         className="relative 2xl:bottom-[11.25rem] 2xl:right-[1rem] xl:bottom-[11.25rem] xl:right-[1rem] sm:bottom-[7.5rem] sm:right-[0.5rem] bottom-[3.75rem] right-[0.25rem]"
-        onClick={() => jump(meta.route)}
       >
         <div
           className="2xl:h-[12rem] 2xl:w-[31rem] xl:h-[12rem] xl:w-[31rem] sm:h-[8rem] sm:w-[8rem] h-[4rem] w-[4rem]
@@ -129,14 +124,6 @@ const HistoryCard = () => {
             historyItems[index]["tool"] +
             "?history=" +
             historyItems[index]["query"]
-          }
-          onClick={() =>
-            jump(
-              "/toolbox/" +
-                historyItems[index]["tool"] +
-                "?history=" +
-                historyItems[index]["query"],
-            )
           }
         >
           <div
