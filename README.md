@@ -6,9 +6,11 @@ Andromeda toolkits is the team project for module CS385FZ at the Maynooth Univer
 
 ## Running and deploying
 
-```bash
-npm run build
-next start
-```
+To start this app in local Android Emulator, run:
 
-The server will start on http://localhost:3000 by default, just open it in browser.
+```bash
+npm install
+npm run build
+npx cap sync
+npx cap run android
+```
