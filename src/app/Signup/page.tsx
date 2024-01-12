@@ -119,23 +119,23 @@ export default function Signup() {
           <TextField
             label="Email Address"
             required={true}
-            className=" w-[24.5rem]"
+            className=" w-[24.5rem] mt-8"
           ></TextField>
-        </ThemeProvider>
 
-        <ThemeProvider theme={inputTheme}>
           <TextField
             label="Username"
             required={true}
-            className=" w-[24.5rem]"
+            className=" w-[24.5rem] mt-8"
             onBlur={(e) => {
               name.current = e.currentTarget.value;
             }}
           ></TextField>
-        </ThemeProvider>
 
-        <ThemeProvider theme={inputTheme}>
-          <FormControl sx={{ m: 1, width: "24.5rem" }} variant="outlined">
+          <FormControl
+            sx={{ width: "24.5rem" }}
+            className="mt-8"
+            variant="outlined"
+          >
             <InputLabel htmlFor="outlined-adornment-password">
               Password
             </InputLabel>
@@ -172,7 +172,7 @@ export default function Signup() {
           <Button
             variant="contained"
             color={"primary"}
-            className="rounded-full bg-indigo-500 px-8"
+            className="rounded-full bg-indigo-500 px-8 mt-8"
             onClick={signUpHandler}
           >
             <p className="text-[1.6rem] text-[#FFFFFF]">sign up</p>
@@ -181,7 +181,7 @@ export default function Signup() {
 
         <div className="mt-[2rem] mx-auto w-[9.5rem] border-t-2 border-[#727D8D]/30"></div>
 
-        <Link href="Signin">
+        <Link href="Signin" className="mt-8">
           <Typography className="text-[#727D8D]" variant="caption">
             Already have an account?
           </Typography>
